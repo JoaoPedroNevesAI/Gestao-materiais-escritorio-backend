@@ -1,6 +1,7 @@
 package br.com.ifescritorio.api.categoria;
 
 import br.com.ifescritorio.model.categoria.Categoria;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CategoriaRequest {
 
+    @NotBlank(message = "Nome é obrigatório")
     private String nome;
 
     private String descricao;

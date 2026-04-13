@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.ifescritorio.util.exception.EntidadeNaoEncontradaException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -24,10 +25,12 @@ public class CategoriaService {
     }
 
     public Categoria obterPorID(Long id) {
-        return repository.findById(id).get();
+        return repository.findById(id)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Categoria", id));
     }
 
     public void delete(Long id) {
-	    repository.deleteById(id);
-	}
+        Categoria categoria = obterPorID(id);
+        repository.delete(categoria);
+    }
 }

@@ -6,6 +6,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.ifescritorio.util.exception.EntidadeNaoEncontradaException;
+import br.com.ifescritorio.util.exception.RegraNegocioException;
+
 @Service
 public class UsuarioService {
 
@@ -16,7 +19,7 @@ public class UsuarioService {
     public Usuario save(Usuario usuario) {
 
         if (repository.findByEmail(usuario.getEmail()).isPresent()) {
-            throw new RuntimeException("Email já cadastrado");
+            throw new RegraNegocioException("Email já cadastrado");
         }
 
         if (usuario.getTipo() == null) {
@@ -31,10 +34,12 @@ public class UsuarioService {
     }
 
     public Usuario obterPorID(Long id) {
-        return repository.findById(id).get();
+        return repository.findById(id)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Usuário", id));
     }
 
     public void delete(Long id) {
-        repository.deleteById(id);
+        Usuario usuario = obterPorID(id);
+        repository.delete(usuario);
     }
 }

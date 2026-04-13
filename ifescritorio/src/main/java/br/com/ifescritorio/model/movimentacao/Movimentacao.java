@@ -21,10 +21,13 @@ public class Movimentacao extends EntidadeAuditavel {
     private Material material;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TipoMovimentacao tipo;
-
+    
+    @Column(nullable = false)
     private Integer quantidade;
-
+    
+    @Column(nullable = false)
     private LocalDate data;
 
 }
