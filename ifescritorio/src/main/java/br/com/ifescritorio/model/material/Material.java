@@ -1,5 +1,7 @@
 package br.com.ifescritorio.model.material;
 
+import java.math.BigDecimal;
+
 import br.com.ifescritorio.util.entity.EntidadeAuditavel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Material extends EntidadeAuditavel {
     
-	@Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 100)
     private String nome;
 
     @Column(length = 255)
@@ -28,4 +30,12 @@ public class Material extends EntidadeAuditavel {
     @Column(nullable = false)
     private Integer quantidade;
 
+    @Column(length = 100)
+    private String categoria;
+
+    @Column(length = 100)
+    private String local;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal valor;
 }
