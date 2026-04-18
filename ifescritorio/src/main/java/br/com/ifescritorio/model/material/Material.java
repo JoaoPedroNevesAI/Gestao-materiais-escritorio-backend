@@ -2,15 +2,10 @@ package br.com.ifescritorio.model.material;
 
 import java.math.BigDecimal;
 
+import br.com.ifescritorio.model.categoria.Categoria;
 import br.com.ifescritorio.util.entity.EntidadeAuditavel;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "material")
@@ -30,8 +25,9 @@ public class Material extends EntidadeAuditavel {
     @Column(nullable = false)
     private Integer quantidade;
 
-    @Column(length = 100)
-    private String categoria;
+    @ManyToOne
+    @JoinColumn(name = "categoria_id", nullable = false)
+    private Categoria categoria;
 
     @Column(length = 100)
     private String local;

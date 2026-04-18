@@ -1,14 +1,13 @@
 package br.com.ifescritorio.model.categoria;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import br.com.ifescritorio.model.material.Material;
 import br.com.ifescritorio.util.entity.EntidadeAuditavel;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "categoria")
@@ -18,11 +17,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Categoria extends EntidadeAuditavel {
-    
-	@Column(nullable = false, length = 100)
+
+    @Column(nullable = false, length = 100)
     private String nome;
-    
-	@Column(length = 255)
+
+    @Column(length = 255)
     private String descricao;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "categoria")
+    private List<Material> materiais;
 }

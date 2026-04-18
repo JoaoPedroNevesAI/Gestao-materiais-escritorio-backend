@@ -2,6 +2,7 @@ package br.com.ifescritorio.api.material;
 
 import java.math.BigDecimal;
 
+import br.com.ifescritorio.model.categoria.Categoria;
 import br.com.ifescritorio.model.material.Material;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -25,14 +26,19 @@ public class MaterialRequest {
     @NotNull(message = "Quantidade é obrigatória")
     @Min(value = 0, message = "Quantidade não pode ser negativa")
     private Integer quantidade;
-
-    private String categoria;
+    
+    @NotNull(message = "Categoria é obrigatória")
+    private Long categoriaId;
 
     private String local;
 
     private BigDecimal valor;
 
     public Material build() {
+
+        Categoria categoria = new Categoria();
+        categoria.setId(categoriaId);
+
         return Material.builder()
             .nome(nome)
             .descricao(descricao)
