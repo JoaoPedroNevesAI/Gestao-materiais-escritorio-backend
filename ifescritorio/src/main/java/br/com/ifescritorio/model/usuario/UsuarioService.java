@@ -19,7 +19,11 @@ public class UsuarioService {
     public Usuario save(Usuario usuario) {
 
         if (repository.findByEmail(usuario.getEmail()).isPresent()) {
-            throw new RegraNegocioException("Email já cadastrado");
+            throw new RuntimeException("Email já cadastrado");
+        }
+
+        if (usuario.getCpf() != null && repository.findByCpf(usuario.getCpf()).isPresent()) {
+            throw new RuntimeException("CPF já cadastrado");
         }
 
         if (usuario.getTipo() == null) {

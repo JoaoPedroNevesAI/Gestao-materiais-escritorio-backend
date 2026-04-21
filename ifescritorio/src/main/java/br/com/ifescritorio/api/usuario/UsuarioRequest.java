@@ -1,14 +1,10 @@
 package br.com.ifescritorio.api.usuario;
 
-import br.com.ifescritorio.model.usuario.Usuario;
 import br.com.ifescritorio.model.usuario.TipoUsuario;
+import br.com.ifescritorio.model.usuario.Usuario;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
@@ -24,10 +20,13 @@ public class UsuarioRequest {
     private String email;
 
     @NotBlank(message = "Senha é obrigatória")
-    @Size(min = 6, message = "Senha deve ter pelo menos 6 caracteres")
     private String senha;
 
     private TipoUsuario tipo;
+
+    private String telefone;
+
+    private String cpf;
 
     public Usuario build() {
         return Usuario.builder()
@@ -35,6 +34,8 @@ public class UsuarioRequest {
             .email(email)
             .senha(senha)
             .tipo(tipo)
+            .telefone(telefone)
+            .cpf(cpf)
             .build();
     }
 }
