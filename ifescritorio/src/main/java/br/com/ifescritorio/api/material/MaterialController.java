@@ -47,10 +47,9 @@ public class MaterialController {
    @PutMapping("/{id}")
    public ResponseEntity<Material> update(@PathVariable Long id, @RequestBody @Valid MaterialRequest request) {
 
-       Material material = request.build();
-       material.setId(id);
+       materialService.update(id, request.build());
 
-       return ResponseEntity.ok(materialService.save(material));
+       return ResponseEntity.ok().build();
    }
    
    @DeleteMapping("/{id}")

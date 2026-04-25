@@ -19,15 +19,34 @@ public class UsuarioService {
     public Usuario save(Usuario usuario) {
 
         if (repository.findByEmail(usuario.getEmail()).isPresent()) {
-            throw new RuntimeException("Email já cadastrado");
+            throw new RegraNegocioException("Email já cadastrado");
         }
 
         if (usuario.getCpf() != null && repository.findByCpf(usuario.getCpf()).isPresent()) {
-            throw new RuntimeException("CPF já cadastrado");
+            throw new RegraNegocioException("CPF já cadastrado");
         }
 
         if (usuario.getTipo() == null) {
             usuario.setTipo(TipoUsuario.CLIENTE);
+        }
+
+        return repository.save(usuario);
+    }
+
+    @Transactional
+    public Usuario update(Long id, Usuario novosDados) {
+
+        Usuario usuario = repository.findById(id)
+            .orElseThrow(() -> new EntidadeNaoEncontradaException("Usuário", id));
+
+        usuario.setNome(novosDados.getNome());
+        usuario.setEmail(novosDados.getEmail());
+        usuario.setCpf(novosDados.getCpf());
+        usuario.setTelefone(novosDados.getTelefone());
+        usuario.setSenha(novosDados.getSenha());
+
+        if (novosDados.getTipo() != null) {
+            usuario.setTipo(novosDados.getTipo());
         }
 
         return repository.save(usuario);

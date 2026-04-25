@@ -23,9 +23,12 @@ public class MovimentacaoService {
     @Transactional
     public Movimentacao save(Movimentacao movimentacao) {
 
+        // 🔥 BUSCA MATERIAL REAL DO BANCO
         Material material = materialRepository.findById(
             movimentacao.getMaterial().getId()
-        ).orElseThrow(() -> new EntidadeNaoEncontradaException("Material", movimentacao.getMaterial().getId()));
+        ).orElseThrow(() -> 
+            new EntidadeNaoEncontradaException("Material", movimentacao.getMaterial().getId())
+        );
 
         Integer quantidade = movimentacao.getQuantidade();
 
@@ -33,6 +36,7 @@ public class MovimentacaoService {
             throw new RegraNegocioException("Quantidade deve ser maior que zero");
         }
 
+        // 🔥 LÓGICA DE NEGÓCIO
         if (movimentacao.getTipo() == TipoMovimentacao.ENTRADA) {
             material.setQuantidade(material.getQuantidade() + quantidade);
         }
@@ -48,7 +52,11 @@ public class MovimentacaoService {
 
         materialRepository.save(material);
 
+        // 🔥 SETA O MATERIAL GERENCIADO (IMPORTANTE)
+        movimentacao.setMaterial(material);
+
         movimentacao.setHabilitado(true);
+
         return repository.save(movimentacao);
     }
 

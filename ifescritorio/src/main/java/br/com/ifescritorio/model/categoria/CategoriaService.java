@@ -20,6 +20,18 @@ public class CategoriaService {
         return repository.save(categoria);
     }
 
+    @Transactional
+    public Categoria update(Long id, Categoria novosDados) {
+
+        Categoria categoria = repository.findById(id)
+            .orElseThrow(() -> new EntidadeNaoEncontradaException("Categoria", id));
+
+        categoria.setNome(novosDados.getNome());
+        categoria.setDescricao(novosDados.getDescricao());
+
+        return repository.save(categoria);
+    }
+
     public List<Categoria> listarTodos() {
         return repository.findAll();
     }

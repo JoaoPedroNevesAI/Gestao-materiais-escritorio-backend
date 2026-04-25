@@ -3,17 +3,8 @@ package br.com.ifescritorio.api.usuario;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import br.com.ifescritorio.model.usuario.Usuario;
 import br.com.ifescritorio.model.usuario.UsuarioService;
@@ -29,9 +20,8 @@ public class UsuarioController {
 
     @PostMapping
     public ResponseEntity<Usuario> save(@RequestBody @Valid UsuarioRequest request) {
-
         Usuario usuario = usuarioService.save(request.build());
-        return new ResponseEntity<>(usuario, HttpStatus.CREATED);
+        return ResponseEntity.status(201).body(usuario);
     }
 
     @GetMapping
@@ -45,12 +35,13 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> update(@PathVariable Long id, @RequestBody @Valid UsuarioRequest request) {
+    public ResponseEntity<Usuario> update(
+            @PathVariable Long id,
+            @RequestBody @Valid UsuarioRequest request) {
 
-        Usuario usuario = request.build();
-        usuario.setId(id);
+        Usuario atualizado = usuarioService.update(id, request.build());
 
-        return ResponseEntity.ok(usuarioService.save(usuario));
+        return ResponseEntity.ok(atualizado);
     }
 
     @DeleteMapping("/{id}")
