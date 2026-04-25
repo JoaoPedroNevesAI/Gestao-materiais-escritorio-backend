@@ -24,7 +24,7 @@ public class MaterialRequest {
     private String descricao;
 
     @NotNull(message = "Quantidade é obrigatória")
-    @Min(value = 0, message = "Quantidade não pode ser negativa")
+    @Min(value = 1, message = "Quantidade deve ser no mínimo 1")
     private Integer quantidade;
     
     @NotNull(message = "Categoria é obrigatória")

@@ -27,6 +27,10 @@ public class MaterialService {
             throw new RegraNegocioException("Quantidade não pode ser negativa");
         }
 
+        if (material.getQuantidade() == 0) {
+            throw new RegraNegocioException("Quantidade deve ser maior que zero");
+        }
+        
         if (material.getCategoria() == null || material.getCategoria().getId() == null) {
             throw new RegraNegocioException("Categoria é obrigatória");
         }
