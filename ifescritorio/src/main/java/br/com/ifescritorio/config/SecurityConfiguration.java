@@ -47,26 +47,96 @@ public class SecurityConfiguration {
 
             .authorizeHttpRequests(auth -> auth
 
+                // AUTH
                 .requestMatchers("/api/auth/**")
                     .permitAll()
 
+                // CADASTRO USUÁRIO
                 .requestMatchers(HttpMethod.POST, "/api/usuario")
                     .permitAll()
 
+                // SWAGGER
                 .requestMatchers(
                     "/swagger-ui/**",
                     "/v3/api-docs/**"
                 )
                     .permitAll()
 
-                .requestMatchers(HttpMethod.GET, "/api/material/**")
-                    .authenticated()
+                 // =========================
+                 // MATERIAL
+                 // =========================
 
-                .requestMatchers("/api/**")
-                    .authenticated()
+                 // LISTAR MATERIAL
+                 .requestMatchers(
+                     HttpMethod.GET,
+                     "/api/material",
+                     "/api/material/**"
+                 )
+                     .hasAnyRole("ADM", "CLIENTE")
 
+                 // CRIAR MATERIAL
+                 .requestMatchers(
+                     HttpMethod.POST,
+                     "/api/material",
+                     "/api/material/**"
+                 )
+                     .hasRole("ADM")
+
+                 // EDITAR MATERIAL
+                 .requestMatchers(
+                     HttpMethod.PUT,
+                     "/api/material",
+                     "/api/material/**"
+                 )
+                     .hasRole("ADM")
+
+                 // DELETAR MATERIAL
+                 .requestMatchers(
+                     HttpMethod.DELETE,
+                     "/api/material",
+                     "/api/material/**"
+                 )
+                     .hasRole("ADM")
+
+                 // =========================
+                 // CATEGORIA
+                 // =========================
+
+                 // LISTAR CATEGORIA
+                 .requestMatchers(
+                     HttpMethod.GET,
+                     "/api/categoria",
+                     "/api/categoria/**"
+                 )
+                     .hasAnyRole("ADM", "CLIENTE")
+
+                 // CRIAR CATEGORIA
+                 .requestMatchers(
+                     HttpMethod.POST,
+                     "/api/categoria",
+                     "/api/categoria/**"
+                 )
+                     .hasRole("ADM")
+
+                 // EDITAR CATEGORIA
+                 .requestMatchers(
+                     HttpMethod.PUT,
+                     "/api/categoria",
+                     "/api/categoria/**"
+                 )
+                     .hasRole("ADM")
+
+                 // DELETAR CATEGORIA
+                 .requestMatchers(
+                     HttpMethod.DELETE,
+                     "/api/categoria",
+                     "/api/categoria/**"
+                 )
+                     .hasRole("ADM")
+
+                // RESTANTE DAS ROTAS
                 .anyRequest()
-                    .permitAll()
+                    .authenticated()
             )
 
             .sessionManagement(session ->

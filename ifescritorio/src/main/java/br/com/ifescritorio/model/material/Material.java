@@ -1,6 +1,7 @@
 package br.com.ifescritorio.model.material;
 
 import java.math.BigDecimal;
+import org.hibernate.annotations.SQLRestriction;
 
 import br.com.ifescritorio.model.categoria.Categoria;
 import br.com.ifescritorio.util.entity.EntidadeAuditavel;
@@ -9,6 +10,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "material")
+@SQLRestriction("habilitado = true")
 @Getter
 @Setter
 @Builder

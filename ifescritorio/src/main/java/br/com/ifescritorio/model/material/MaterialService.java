@@ -67,9 +67,13 @@ public class MaterialService {
         return repository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Material", id));
     }
-
+    @Transactional
     public void delete(Long id) {
-        Material material = obterPorID(id);
-        repository.delete(material);
+        Material material = repository.findById(id)
+            .orElseThrow(() ->
+                new EntidadeNaoEncontradaException("Material", id)
+            );
+        material.setHabilitado(Boolean.FALSE);
+        repository.save(material);
     }
 }
