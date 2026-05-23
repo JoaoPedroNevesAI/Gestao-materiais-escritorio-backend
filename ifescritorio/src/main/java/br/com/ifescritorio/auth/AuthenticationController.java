@@ -2,12 +2,15 @@ package br.com.ifescritorio.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import br.com.ifescritorio.model.usuario.Usuario;
 import br.com.ifescritorio.model.usuario.UsuarioService;
 import br.com.ifescritorio.seguranca.JwtService;
-
 import jakarta.validation.Valid;
 
 @RestController
@@ -36,6 +39,8 @@ public class AuthenticationController {
         return ResponseEntity.ok(
             AuthenticationResponse.builder()
                 .token(token)
+                .nome(usuario.getNome())
+                .role("ROLE_" + usuario.getTipo().name())
                 .build()
         );
     }

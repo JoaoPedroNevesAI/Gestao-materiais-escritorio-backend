@@ -4,32 +4,35 @@ import java.io.IOException;
 
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import br.com.ifescritorio.model.usuario.Usuario;
+import br.com.ifescritorio.model.usuario.UsuarioRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter
+    extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
+
+    private final UsuarioRepository usuarioRepository;
 
     public JwtAuthenticationFilter(
         JwtService jwtService,
-        UserDetailsService userDetailsService
+        UsuarioRepository usuarioRepository
     ) {
 
         this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
+
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
@@ -39,32 +42,71 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
+        final String authHeader =
+            request.getHeader("Authorization");
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        final String jwt;
 
-            filterChain.doFilter(request, response);
+        final String email;
+
+        // =========================
+        // SEM TOKEN
+        // =========================
+        if (
+            authHeader == null ||
+            !authHeader.startsWith("Bearer ")
+        ) {
+
+            filterChain.doFilter(
+                request,
+                response
+            );
+
             return;
         }
 
-        final String jwt = authHeader.substring(7);
-        final String userEmail = jwtService.extractUsername(jwt);
+        // =========================
+        // EXTRAI TOKEN
+        // =========================
+        jwt = authHeader.substring(7);
 
-        Authentication authentication =
-            SecurityContextHolder.getContext().getAuthentication();
+        email = jwtService.extractUsername(jwt);
+        
 
-        if (userEmail != null && authentication == null) {
+        // =========================
+        // NÃO AUTENTICADO AINDA
+        // =========================
+        if (
+            email != null &&
+            SecurityContextHolder
+                .getContext()
+                .getAuthentication() == null
+        ) {
 
-            UserDetails userDetails =
-                this.userDetailsService.loadUserByUsername(userEmail);
+            Usuario usuario =
+                usuarioRepository
+                    .findByEmail(email)
+                    .orElse(null);
 
-            if (jwtService.isTokenValid(jwt, userDetails)) {
+            if (
+                usuario != null &&
+                jwtService.isTokenValid(jwt, usuario)
+            ) {
+
+                // =========================
+                // ROLE CORRETA
+                // =========================
+                String role =
+                    "ROLE_" +
+                    usuario.getTipo().name();
+        SimpleGrantedAuthority authority =
+            new SimpleGrantedAuthority(role);
 
                 UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
-                        userDetails,
+                        usuario,
                         null,
-                        userDetails.getAuthorities()
+                        java.util.List.of(authority)
                     );
 
                 authToken.setDetails(
@@ -78,6 +120,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(
+            request,
+            response
+        );
     }
 }
