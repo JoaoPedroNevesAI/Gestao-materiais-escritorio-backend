@@ -1,5 +1,4 @@
 package br.com.ifescritorio.config;
-
 import java.util.Arrays;
 import java.util.List;
 

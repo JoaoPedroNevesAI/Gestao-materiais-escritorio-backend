@@ -1,5 +1,4 @@
 package br.com.ifescritorio.seguranca;
-
 import java.io.IOException;
 
 import org.springframework.lang.NonNull;
