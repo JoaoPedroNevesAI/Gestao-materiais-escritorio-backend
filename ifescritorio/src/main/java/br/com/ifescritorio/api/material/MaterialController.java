@@ -2,6 +2,7 @@ package br.com.ifescritorio.api.material;
 
 import java.util.List;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,8 @@ import br.com.ifescritorio.model.material.Material;
 import br.com.ifescritorio.model.material.MaterialService;
 import jakarta.validation.Valid;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 @RestController
 @RequestMapping("/api/material")
 @CrossOrigin
@@ -28,10 +31,26 @@ public class MaterialController {
    private MaterialService materialService;
 
    @PostMapping
-   public ResponseEntity<Material> save(@RequestBody @Valid MaterialRequest request) {
+   public ResponseEntity<Material> save(
+       @RequestBody @Valid MaterialRequest request
+   ) {
 
-       Material material = materialService.save(request.build());
-       return new ResponseEntity<>(material, HttpStatus.CREATED);
+       Authentication auth =
+           SecurityContextHolder.getContext().getAuthentication();
+
+       System.out.println("================================");
+       System.out.println("AUTH = " + auth);
+       System.out.println("USER = " + auth.getName());
+       System.out.println("ROLES = " + auth.getAuthorities());
+       System.out.println("================================");
+
+       Material material =
+           materialService.save(request.build());
+
+       return new ResponseEntity<>(
+           material,
+           HttpStatus.CREATED
+       );
    }
 
    @GetMapping

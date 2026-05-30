@@ -36,6 +36,8 @@ public class AuthenticationController {
         return ResponseEntity.ok(
             AuthenticationResponse.builder()
                 .token(token)
+                .nome(usuario.getNome())
+                .role("ROLE_" + usuario.getTipo().name())
                 .build()
         );
     }
