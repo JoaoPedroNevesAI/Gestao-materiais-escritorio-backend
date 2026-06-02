@@ -5,12 +5,17 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import br.com.ifescritorio.model.categoria.Categoria;
 import br.com.ifescritorio.model.categoria.CategoriaRepository;
 import br.com.ifescritorio.model.local.Local;
 import br.com.ifescritorio.model.local.LocalRepository;
+import br.com.ifescritorio.model.movimentacao.MovimentacaoService;
+import br.com.ifescritorio.model.movimentacao.TipoMovimentacao;
+import br.com.ifescritorio.model.usuario.Usuario;
+import br.com.ifescritorio.model.usuario.UsuarioRepository;
 import br.com.ifescritorio.util.exception.EntidadeNaoEncontradaException;
 
 @Service
@@ -25,10 +30,27 @@ public class MaterialService {
     @Autowired
     private LocalRepository localRepository;
 
+    @Autowired
+    private MovimentacaoService movimentacaoService;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    private Usuario obterUsuarioLogado() {
+
+        String email =
+            SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        return usuarioRepository
+            .findByEmail(email)
+            .orElse(null);
+    }
 
     @Transactional
     public Material save(Material material) {
-
 
         Categoria categoria =
             categoriaRepository.findById(
@@ -39,7 +61,6 @@ public class MaterialService {
                     material.getCategoria().getId()
                 )
             );
-
 
         Local local =
             localRepository.findById(
@@ -52,14 +73,21 @@ public class MaterialService {
             );
 
         material.setCategoria(categoria);
-
         material.setLocal(local);
-
         material.setHabilitado(Boolean.TRUE);
 
-        return repository.save(material);
-    }
+        Material materialSalvo =
+            repository.save(material);
 
+        movimentacaoService.registrar(
+            materialSalvo,
+            TipoMovimentacao.CADASTRO,
+            "Cadastro do material: " + materialSalvo.getNome(),
+            obterUsuarioLogado()
+        );
+
+        return materialSalvo;
+    }
 
     @Transactional
     public Material update(
@@ -96,7 +124,6 @@ public class MaterialService {
             novosDados.getImagemUrl()
         );
 
-
         if (novosDados.getCategoria() != null) {
 
             Categoria categoria =
@@ -111,7 +138,6 @@ public class MaterialService {
 
             material.setCategoria(categoria);
         }
-
 
         if (novosDados.getLocal() != null) {
 
@@ -128,15 +154,23 @@ public class MaterialService {
             material.setLocal(local);
         }
 
-        return repository.save(material);
-    }
+        Material materialAtualizado =
+            repository.save(material);
 
+        movimentacaoService.registrar(
+            materialAtualizado,
+            TipoMovimentacao.EDICAO,
+            "Edição do material: " + materialAtualizado.getNome(),
+            obterUsuarioLogado()
+        );
+
+        return materialAtualizado;
+    }
 
     public List<Material> listarTodos() {
 
         return repository.findAll();
     }
-
 
     public Material obterPorID(Long id) {
 
@@ -164,5 +198,12 @@ public class MaterialService {
         material.setHabilitado(Boolean.FALSE);
 
         repository.save(material);
+
+        movimentacaoService.registrar(
+            material,
+            TipoMovimentacao.BAIXA,
+            "Baixa do material: " + material.getNome(),
+            obterUsuarioLogado()
+        );
     }
 }

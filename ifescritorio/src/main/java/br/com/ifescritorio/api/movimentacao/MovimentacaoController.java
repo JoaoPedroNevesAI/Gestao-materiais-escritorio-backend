@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 
 import br.com.ifescritorio.model.movimentacao.Movimentacao;
 import br.com.ifescritorio.model.movimentacao.MovimentacaoService;
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/movimentacao")
@@ -17,13 +16,11 @@ public class MovimentacaoController {
     @Autowired
     private MovimentacaoService service;
 
-    @PostMapping
-    public Movimentacao save(@RequestBody @Valid MovimentacaoRequest request) {
-        return service.save(request.build());
-    }
+    @GetMapping("/material/{id}")
+    public List<Movimentacao> listarPorMaterial(
+        @PathVariable Long id
+    ) {
 
-    @GetMapping
-    public List<Movimentacao> listarTodos() {
-        return service.listarTodos();
+        return service.listarPorMaterial(id);
     }
 }
