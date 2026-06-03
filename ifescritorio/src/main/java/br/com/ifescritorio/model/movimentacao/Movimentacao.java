@@ -2,6 +2,7 @@ package br.com.ifescritorio.model.movimentacao;
 
 import java.time.LocalDateTime;
 
+import br.com.ifescritorio.model.local.Local;
 import br.com.ifescritorio.model.material.Material;
 import br.com.ifescritorio.model.usuario.Usuario;
 import br.com.ifescritorio.util.entity.EntidadeAuditavel;
@@ -21,12 +22,16 @@ public class Movimentacao extends EntidadeAuditavel {
     @JoinColumn(name = "material_id", nullable = false)
     private Material material;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TipoMovimentacao tipo;
+    @ManyToOne
+    @JoinColumn(name = "local_origem_id", nullable = false)
+    private Local localOrigem;
+
+    @ManyToOne
+    @JoinColumn(name = "local_destino_id", nullable = false)
+    private Local localDestino;
 
     @Column(length = 500)
-    private String descricao;
+    private String observacao;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")

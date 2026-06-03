@@ -5,17 +5,12 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import br.com.ifescritorio.model.categoria.Categoria;
 import br.com.ifescritorio.model.categoria.CategoriaRepository;
 import br.com.ifescritorio.model.local.Local;
 import br.com.ifescritorio.model.local.LocalRepository;
-import br.com.ifescritorio.model.movimentacao.MovimentacaoService;
-import br.com.ifescritorio.model.movimentacao.TipoMovimentacao;
-import br.com.ifescritorio.model.usuario.Usuario;
-import br.com.ifescritorio.model.usuario.UsuarioRepository;
 import br.com.ifescritorio.util.exception.EntidadeNaoEncontradaException;
 
 @Service
@@ -29,25 +24,6 @@ public class MaterialService {
 
     @Autowired
     private LocalRepository localRepository;
-
-    @Autowired
-    private MovimentacaoService movimentacaoService;
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    private Usuario obterUsuarioLogado() {
-
-        String email =
-            SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
-
-        return usuarioRepository
-            .findByEmail(email)
-            .orElse(null);
-    }
 
     @Transactional
     public Material save(Material material) {
@@ -76,17 +52,7 @@ public class MaterialService {
         material.setLocal(local);
         material.setHabilitado(Boolean.TRUE);
 
-        Material materialSalvo =
-            repository.save(material);
-
-        movimentacaoService.registrar(
-            materialSalvo,
-            TipoMovimentacao.CADASTRO,
-            "Cadastro do material: " + materialSalvo.getNome(),
-            obterUsuarioLogado()
-        );
-
-        return materialSalvo;
+        return repository.save(material);
     }
 
     @Transactional
@@ -154,17 +120,7 @@ public class MaterialService {
             material.setLocal(local);
         }
 
-        Material materialAtualizado =
-            repository.save(material);
-
-        movimentacaoService.registrar(
-            materialAtualizado,
-            TipoMovimentacao.EDICAO,
-            "Edição do material: " + materialAtualizado.getNome(),
-            obterUsuarioLogado()
-        );
-
-        return materialAtualizado;
+        return repository.save(material);
     }
 
     public List<Material> listarTodos() {
@@ -198,12 +154,5 @@ public class MaterialService {
         material.setHabilitado(Boolean.FALSE);
 
         repository.save(material);
-
-        movimentacaoService.registrar(
-            material,
-            TipoMovimentacao.BAIXA,
-            "Baixa do material: " + material.getNome(),
-            obterUsuarioLogado()
-        );
     }
 }

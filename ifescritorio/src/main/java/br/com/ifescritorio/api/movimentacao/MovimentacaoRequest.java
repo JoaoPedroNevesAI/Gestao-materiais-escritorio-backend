@@ -1,6 +1,5 @@
 package br.com.ifescritorio.api.movimentacao;
 
-import br.com.ifescritorio.model.movimentacao.TipoMovimentacao;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -11,7 +10,7 @@ public class MovimentacaoRequest {
     private Long materialId;
 
     @NotNull
-    private TipoMovimentacao tipo;
+    private Long localDestinoId;
 
-    private String descricao;
+    private String observacao;
 }
