@@ -155,4 +155,66 @@ public class MaterialService {
 
         repository.save(material);
     }
+    
+    public List<Material> filtrar(
+    	    String nome,
+    	    Long idCategoria,
+    	    Long idLocal
+    	) {
+
+    	    List<Material> listaMateriais =
+    	        repository.findAll();
+
+    	    if (
+    	        (nome != null && !nome.isBlank()) &&
+    	        idCategoria == null &&
+    	        idLocal == null
+    	    ) {
+
+    	        listaMateriais =
+    	            repository
+    	                .findByNomeContainingIgnoreCaseOrderByNomeAsc(
+    	                    nome
+    	                );
+    	    }
+
+    	    else if (
+    	        (nome == null || nome.isBlank()) &&
+    	        idCategoria != null &&
+    	        idLocal == null
+    	    ) {
+
+    	        listaMateriais =
+    	            repository.consultarPorCategoria(
+    	                idCategoria
+    	            );
+    	    }
+
+    	    else if (
+    	        (nome == null || nome.isBlank()) &&
+    	        idCategoria == null &&
+    	        idLocal != null
+    	    ) {
+
+    	        listaMateriais =
+    	            repository.consultarPorLocal(
+    	                idLocal
+    	            );
+    	    }
+
+    	    else if (
+    	        (nome != null && !nome.isBlank()) &&
+    	        idCategoria != null &&
+    	        idLocal == null
+    	    ) {
+
+    	        listaMateriais =
+    	            repository.consultarPorNomeECategoria(
+    	                nome,
+    	                idCategoria
+    	            );
+    	    }
+
+    	    return listaMateriais;
+    	}
 }
