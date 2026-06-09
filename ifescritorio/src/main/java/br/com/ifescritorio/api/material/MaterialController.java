@@ -2,6 +2,8 @@ package br.com.ifescritorio.api.material;
 
 import java.util.List;
 
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,9 @@ import br.com.ifescritorio.model.material.Material;
 import br.com.ifescritorio.model.material.MaterialService;
 import jakarta.validation.Valid;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/api/material")
 @CrossOrigin
@@ -28,10 +33,26 @@ public class MaterialController {
    private MaterialService materialService;
 
    @PostMapping
-   public ResponseEntity<Material> save(@RequestBody @Valid MaterialRequest request) {
+   public ResponseEntity<Material> save(
+       @RequestBody @Valid MaterialRequest request
+   ) {
 
-       Material material = materialService.save(request.build());
-       return new ResponseEntity<>(material, HttpStatus.CREATED);
+       Authentication auth =
+           SecurityContextHolder.getContext().getAuthentication();
+
+       System.out.println("================================");
+       System.out.println("AUTH = " + auth);
+       System.out.println("USER = " + auth.getName());
+       System.out.println("ROLES = " + auth.getAuthorities());
+       System.out.println("================================");
+
+       Material material =
+           materialService.save(request.build());
+
+       return new ResponseEntity<>(
+           material,
+           HttpStatus.CREATED
+       );
    }
 
    @GetMapping
@@ -56,5 +77,34 @@ public class MaterialController {
    public ResponseEntity<Void> delete(@PathVariable Long id) {
        materialService.delete(id);
        return ResponseEntity.noContent().build();
+   }
+   
+   @PostMapping("/filtrar")
+   public List<Material> filtrar(
+
+       @RequestParam(
+           value = "nome",
+           required = false
+       )
+       String nome,
+
+       @RequestParam(
+           value = "idCategoria",
+           required = false
+       )
+       Long idCategoria,
+
+       @RequestParam(
+           value = "idLocal",
+           required = false
+       )
+       Long idLocal
+   ) {
+
+       return materialService.filtrar(
+           nome,
+           idCategoria,
+           idLocal
+       );
    }
 }

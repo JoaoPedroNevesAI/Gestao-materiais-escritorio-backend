@@ -1,15 +1,17 @@
 package br.com.ifescritorio.model.movimentacao;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.ifescritorio.model.local.Local;
+import br.com.ifescritorio.model.local.LocalRepository;
 import br.com.ifescritorio.model.material.Material;
 import br.com.ifescritorio.model.material.MaterialRepository;
+import br.com.ifescritorio.model.usuario.Usuario;
 import br.com.ifescritorio.util.exception.EntidadeNaoEncontradaException;
-import br.com.ifescritorio.util.exception.RegraNegocioException;
-import jakarta.transaction.Transactional;
 
 @Service
 public class MovimentacaoService {
@@ -20,47 +22,58 @@ public class MovimentacaoService {
     @Autowired
     private MaterialRepository materialRepository;
 
-    @Transactional
-    public Movimentacao save(Movimentacao movimentacao) {
+    @Autowired
+    private LocalRepository localRepository;
 
-        // 🔥 BUSCA MATERIAL REAL DO BANCO
-        Material material = materialRepository.findById(
-            movimentacao.getMaterial().getId()
-        ).orElseThrow(() -> 
-            new EntidadeNaoEncontradaException("Material", movimentacao.getMaterial().getId())
-        );
+    public Movimentacao transferir(
+            Long materialId,
+            Long localDestinoId,
+            String observacao,
+            Usuario usuario) {
 
-        Integer quantidade = movimentacao.getQuantidade();
+        Material material =
+                materialRepository.findById(materialId)
+                        .orElseThrow(() ->
+                                new EntidadeNaoEncontradaException(
+                                        "Material",
+                                        materialId));
 
-        if (quantidade == null || quantidade <= 0) {
-            throw new RegraNegocioException("Quantidade deve ser maior que zero");
+        Local origem = material.getLocal();
+
+        Local destino =
+                localRepository.findById(localDestinoId)
+                        .orElseThrow(() ->
+                                new EntidadeNaoEncontradaException(
+                                        "Local",
+                                        localDestinoId));
+
+        if (origem.getId().equals(destino.getId())) {
+            throw new IllegalArgumentException(
+                    "O material já está neste local.");
         }
 
-        // 🔥 LÓGICA DE NEGÓCIO
-        if (movimentacao.getTipo() == TipoMovimentacao.ENTRADA) {
-            material.setQuantidade(material.getQuantidade() + quantidade);
-        }
-
-        if (movimentacao.getTipo() == TipoMovimentacao.SAIDA) {
-
-            if (material.getQuantidade() < quantidade) {
-                throw new RegraNegocioException("Estoque insuficiente");
-            }
-
-            material.setQuantidade(material.getQuantidade() - quantidade);
-        }
+        material.setLocal(destino);
 
         materialRepository.save(material);
 
-        // 🔥 SETA O MATERIAL GERENCIADO (IMPORTANTE)
-        movimentacao.setMaterial(material);
-
-        movimentacao.setHabilitado(true);
+        Movimentacao movimentacao =
+                Movimentacao.builder()
+                        .material(material)
+                        .localOrigem(origem)
+                        .localDestino(destino)
+                        .observacao(observacao)
+                        .usuario(usuario)
+                        .dataMovimentacao(LocalDateTime.now())
+                        .build();
 
         return repository.save(movimentacao);
     }
 
-    public List<Movimentacao> listarTodos() {
-        return repository.findAll();
+    public List<Movimentacao> listarPorMaterial(
+            Long materialId) {
+
+        return repository
+                .findByMaterialIdOrderByDataMovimentacaoDesc(
+                        materialId);
     }
 }

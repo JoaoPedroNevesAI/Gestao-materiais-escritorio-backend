@@ -1,6 +1,8 @@
 package br.com.ifescritorio.model.material;
 
+import br.com.ifescritorio.model.local.Local;
 import java.math.BigDecimal;
+import org.hibernate.annotations.SQLRestriction;
 
 import br.com.ifescritorio.model.categoria.Categoria;
 import br.com.ifescritorio.util.entity.EntidadeAuditavel;
@@ -9,6 +11,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "material")
+@SQLRestriction("habilitado = true")
 @Getter
 @Setter
 @Builder
@@ -29,8 +32,9 @@ public class Material extends EntidadeAuditavel {
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 
-    @Column(length = 100)
-    private String local;
+    @ManyToOne
+    @JoinColumn(name = "local_id")
+    private Local local;
 
     @Column(precision = 10, scale = 2)
     private BigDecimal valor;

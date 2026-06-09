@@ -27,7 +27,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         JwtService jwtService,
         UserDetailsService userDetailsService
     ) {
-
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
     }
@@ -59,6 +58,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 this.userDetailsService.loadUserByUsername(userEmail);
 
             if (jwtService.isTokenValid(jwt, userDetails)) {
+
+                System.out.println("=================================");
+                System.out.println("JWT VALIDADO");
+                System.out.println("EMAIL: " + userDetails.getUsername());
+                System.out.println("AUTORIDADES: " + userDetails.getAuthorities());
+                System.out.println("=================================");
 
                 UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(

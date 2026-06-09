@@ -3,6 +3,7 @@ package br.com.ifescritorio.api.material;
 import java.math.BigDecimal;
 
 import br.com.ifescritorio.model.categoria.Categoria;
+import br.com.ifescritorio.model.local.Local;
 import br.com.ifescritorio.model.material.Material;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -30,7 +31,8 @@ public class MaterialRequest {
     @NotNull(message = "Categoria é obrigatória")
     private Long categoriaId;
 
-    private String local;
+    @NotNull(message = "Local é obrigatório")
+    private Long localId;
 
     private BigDecimal valor;
     
@@ -40,6 +42,9 @@ public class MaterialRequest {
 
         Categoria categoria = new Categoria();
         categoria.setId(categoriaId);
+
+        Local local = new Local();
+        local.setId(localId);
 
         return Material.builder()
             .nome(nome)
