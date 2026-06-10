@@ -53,7 +53,6 @@ public class MovimentacaoService {
         }
 
         material.setLocal(destino);
-
         materialRepository.save(material);
 
         Movimentacao movimentacao =
@@ -67,6 +66,10 @@ public class MovimentacaoService {
                         .build();
 
         return repository.save(movimentacao);
+    }
+
+    public List<Movimentacao> listarTodas() {
+        return repository.findAllByOrderByDataMovimentacaoDesc();
     }
 
     public List<Movimentacao> listarPorMaterial(

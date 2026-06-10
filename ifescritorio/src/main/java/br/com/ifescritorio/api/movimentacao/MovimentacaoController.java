@@ -44,6 +44,12 @@ public class MovimentacaoController {
                 usuario);
     }
 
+    
+    @GetMapping
+    public List<Movimentacao> listarTodas() {
+        return service.listarTodas();
+    }
+
     @GetMapping("/material/{id}")
     public List<Movimentacao> listarPorMaterial(
             @PathVariable Long id) {
