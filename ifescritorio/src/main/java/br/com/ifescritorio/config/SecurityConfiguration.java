@@ -1,6 +1,5 @@
 package br.com.ifescritorio.config;
 import java.util.Arrays;
-import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,9 +38,7 @@ public class SecurityConfiguration {
         JwtAuthenticationFilter jwtAuthenticationFilter,
         AuthenticationProvider authenticationProvider
     ) {
-
         this.authenticationProvider = authenticationProvider;
-
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
@@ -56,9 +53,7 @@ public class SecurityConfiguration {
             // CORS
             // =========================
             .cors(cors ->
-                cors.configurationSource(
-                    corsConfigurationSource()
-                )
+                cors.configurationSource(corsConfigurationSource())
             )
 
             // =========================
@@ -72,120 +67,101 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
 
                 // LIBERA OPTIONS
-                .requestMatchers(
-                    HttpMethod.OPTIONS,
-                    "/**"
-                ).permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                 // =========================
                 // AUTH
                 // =========================
-                .requestMatchers(
-                    "/api/auth/**"
-                ).permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
 
                 // =========================
                 // CADASTRO USUÁRIO
                 // =========================
-                .requestMatchers(
-                    HttpMethod.POST,
-                    "/api/usuario"
-                ).permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/usuario").permitAll()
 
                 // =========================
                 // SWAGGER
                 // =========================
-                .requestMatchers(
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**"
-                ).permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                 // =========================
                 // MATERIAL
                 // =========================
 
                 // LISTAR
-                .requestMatchers(
-                    HttpMethod.GET,
-                    "/api/material/**"
-                )
-                .hasAnyRole("ADM", "CLIENTE")
+                .requestMatchers(HttpMethod.GET,    "/api/material/**").hasAnyRole("ADM", "CLIENTE")
+
+                // FILTRAR (POST permitido para CLIENTE)
+                .requestMatchers(HttpMethod.POST,   "/api/material/filtrar").hasAnyRole("ADM", "CLIENTE")
 
                 // CRIAR
-                .requestMatchers(
-                    HttpMethod.POST,
-                    "/api/material/**"
-                )
-                .hasRole("ADM")
+                .requestMatchers(HttpMethod.POST,   "/api/material/**").hasRole("ADM")
 
                 // EDITAR
-                .requestMatchers(
-                    HttpMethod.PUT,
-                    "/api/material/**"
-                )
-                .hasRole("ADM")
+                .requestMatchers(HttpMethod.PUT,    "/api/material/**").hasRole("ADM")
 
                 // DELETAR
-                .requestMatchers(
-                    HttpMethod.DELETE,
-                    "/api/material/**"
-                )
-                .hasRole("ADM")
+                .requestMatchers(HttpMethod.DELETE, "/api/material/**").hasRole("ADM")
 
                 // =========================
                 // CATEGORIA
                 // =========================
 
                 // LISTAR
-                .requestMatchers(
-                    HttpMethod.GET,
-                    "/api/categoria/**"
-                )
-                .hasAnyRole("ADM", "CLIENTE")
+                .requestMatchers(HttpMethod.GET,    "/api/categoria/**").hasAnyRole("ADM", "CLIENTE")
+
+                // FILTRAR (POST permitido para CLIENTE)
+                .requestMatchers(HttpMethod.POST,   "/api/categoria/filtrar").hasAnyRole("ADM", "CLIENTE")
 
                 // CRIAR
-                .requestMatchers(
-                    HttpMethod.POST,
-                    "/api/categoria/**"
-                )
-                .hasRole("ADM")
+                .requestMatchers(HttpMethod.POST,   "/api/categoria/**").hasRole("ADM")
 
                 // EDITAR
-                .requestMatchers(
-                    HttpMethod.PUT,
-                    "/api/categoria/**"
-                )
-                .hasRole("ADM")
+                .requestMatchers(HttpMethod.PUT,    "/api/categoria/**").hasRole("ADM")
 
                 // DELETAR
-                .requestMatchers(
-                    HttpMethod.DELETE,
-                    "/api/categoria/**"
-                )
-                .hasRole("ADM")
+                .requestMatchers(HttpMethod.DELETE, "/api/categoria/**").hasRole("ADM")
+
+                // =========================
+                // MOVIMENTAÇÃO
+                // =========================
+
+                // LISTAR / FILTRAR
+                .requestMatchers(HttpMethod.GET,  "/api/movimentacao/**").hasAnyRole("ADM", "CLIENTE")
+
+                // TRANSFERIR (só ADM)
+                .requestMatchers(HttpMethod.POST, "/api/movimentacao/**").hasRole("ADM")
+
+                // =========================
+                // SOLICITAÇÃO
+                // =========================
+
+                // SOLICITAR (ADM e CLIENTE)
+                .requestMatchers(HttpMethod.POST, "/api/solicitacao-movimentacao/solicitar").hasAnyRole("ADM", "CLIENTE")
+
+                // VER PENDENTES (só ADM)
+                .requestMatchers(HttpMethod.GET,  "/api/solicitacao-movimentacao/**").hasRole("ADM")
+
+                // APROVAR / REPROVAR (só ADM)
+                .requestMatchers(HttpMethod.PUT,  "/api/solicitacao-movimentacao/**").hasRole("ADM")
 
                 // =========================
                 // RESTANTE
                 // =========================
-                .anyRequest()
-                .authenticated()
+                .anyRequest().authenticated()
             )
 
             // =========================
             // SESSION
             // =========================
             .sessionManagement(session ->
-                session.sessionCreationPolicy(
-                    SessionCreationPolicy.STATELESS
-                )
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
             // =========================
             // PROVIDER
             // =========================
-            .authenticationProvider(
-                authenticationProvider
-            )
+            .authenticationProvider(authenticationProvider)
 
             // =========================
             // JWT FILTER
@@ -204,45 +180,27 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
-        CorsConfiguration configuration =
-            new CorsConfiguration();
+        CorsConfiguration configuration = new CorsConfiguration();
 
         // FRONTENDS
-        configuration.setAllowedOrigins(
-            Arrays.asList(
-                "http://localhost:3000",
-                "http://localhost:5173"
-            )
-        );
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:3000",
+            "http://localhost:5173"
+        ));
 
         // MÉTODOS
-        configuration.setAllowedMethods(
-            Arrays.asList(
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "OPTIONS"
-            )
-        );
+        configuration.setAllowedMethods(Arrays.asList(
+            "GET", "POST", "PUT", "DELETE", "OPTIONS"
+        ));
 
         // HEADERS
-        configuration.setAllowedHeaders(
-            Arrays.asList(
-                "*"
-            )
-        );
+        configuration.setAllowedHeaders(Arrays.asList("*"));
 
         // CREDENCIAIS
         configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
-
-        source.registerCorsConfiguration(
-            "/**",
-            configuration
-        );
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
 
         return source;
     }
