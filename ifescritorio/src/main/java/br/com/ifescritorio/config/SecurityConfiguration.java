@@ -1,30 +1,19 @@
 package br.com.ifescritorio.config;
+
 import java.util.Arrays;
-import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.http.HttpMethod;
-
 import org.springframework.security.authentication.AuthenticationProvider;
-
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-
 import org.springframework.security.config.http.SessionCreationPolicy;
-
 import org.springframework.security.web.SecurityFilterChain;
-
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import org.springframework.web.cors.CorsConfiguration;
-
 import org.springframework.web.cors.CorsConfigurationSource;
-
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import br.com.ifescritorio.seguranca.JwtAuthenticationFilter;
 
 @Configuration
@@ -32,34 +21,24 @@ import br.com.ifescritorio.seguranca.JwtAuthenticationFilter;
 public class SecurityConfiguration {
 
     private final AuthenticationProvider authenticationProvider;
-
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfiguration(
         JwtAuthenticationFilter jwtAuthenticationFilter,
         AuthenticationProvider authenticationProvider
     ) {
-
         this.authenticationProvider = authenticationProvider;
-
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(
-        HttpSecurity http
-    ) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-
             // =========================
             // CORS
             // =========================
-            .cors(cors ->
-                cors.configurationSource(
-                    corsConfigurationSource()
-                )
-            )
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
             // =========================
             // CSRF
@@ -72,25 +51,20 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
 
                 // LIBERA OPTIONS
-                .requestMatchers(
-                    HttpMethod.OPTIONS,
-                    "/**"
-                ).permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**")
+                .permitAll()
 
                 // =========================
                 // AUTH
                 // =========================
-                .requestMatchers(
-                    "/api/auth/**"
-                ).permitAll()
+                .requestMatchers("/api/auth/**")
+                .permitAll()
 
                 // =========================
                 // CADASTRO USUÁRIO
                 // =========================
-                .requestMatchers(
-                    HttpMethod.POST,
-                    "/api/usuario"
-                ).permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/usuario")
+                .permitAll()
 
                 // =========================
                 // SWAGGER
@@ -104,32 +78,24 @@ public class SecurityConfiguration {
                 // MATERIAL
                 // =========================
 
+                // FILTRAR — deve vir ANTES da regra geral de POST
+                .requestMatchers(HttpMethod.POST, "/api/material/filtrar")
+                .hasAnyRole("ADM", "CLIENTE")
+
                 // LISTAR
-                .requestMatchers(
-                    HttpMethod.GET,
-                    "/api/material/**"
-                )
+                .requestMatchers(HttpMethod.GET, "/api/material/**")
                 .hasAnyRole("ADM", "CLIENTE")
 
                 // CRIAR
-                .requestMatchers(
-                    HttpMethod.POST,
-                    "/api/material/**"
-                )
+                .requestMatchers(HttpMethod.POST, "/api/material/**")
                 .hasRole("ADM")
 
                 // EDITAR
-                .requestMatchers(
-                    HttpMethod.PUT,
-                    "/api/material/**"
-                )
+                .requestMatchers(HttpMethod.PUT, "/api/material/**")
                 .hasRole("ADM")
 
                 // DELETAR
-                .requestMatchers(
-                    HttpMethod.DELETE,
-                    "/api/material/**"
-                )
+                .requestMatchers(HttpMethod.DELETE, "/api/material/**")
                 .hasRole("ADM")
 
                 // =========================
@@ -137,31 +103,19 @@ public class SecurityConfiguration {
                 // =========================
 
                 // LISTAR
-                .requestMatchers(
-                    HttpMethod.GET,
-                    "/api/categoria/**"
-                )
+                .requestMatchers(HttpMethod.GET, "/api/categoria/**")
                 .hasAnyRole("ADM", "CLIENTE")
 
                 // CRIAR
-                .requestMatchers(
-                    HttpMethod.POST,
-                    "/api/categoria/**"
-                )
+                .requestMatchers(HttpMethod.POST, "/api/categoria/**")
                 .hasRole("ADM")
 
                 // EDITAR
-                .requestMatchers(
-                    HttpMethod.PUT,
-                    "/api/categoria/**"
-                )
+                .requestMatchers(HttpMethod.PUT, "/api/categoria/**")
                 .hasRole("ADM")
 
                 // DELETAR
-                .requestMatchers(
-                    HttpMethod.DELETE,
-                    "/api/categoria/**"
-                )
+                .requestMatchers(HttpMethod.DELETE, "/api/categoria/**")
                 .hasRole("ADM")
 
                 // =========================
@@ -175,17 +129,13 @@ public class SecurityConfiguration {
             // SESSION
             // =========================
             .sessionManagement(session ->
-                session.sessionCreationPolicy(
-                    SessionCreationPolicy.STATELESS
-                )
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
             // =========================
             // PROVIDER
             // =========================
-            .authenticationProvider(
-                authenticationProvider
-            )
+            .authenticationProvider(authenticationProvider)
 
             // =========================
             // JWT FILTER
@@ -204,48 +154,30 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
-        CorsConfiguration configuration =
-            new CorsConfiguration();
+        CorsConfiguration configuration = new CorsConfiguration();
 
         // FRONTENDS
-        configuration.setAllowedOrigins(
-            Arrays.asList(
-                "http://localhost:3000",
-                "http://localhost:5173",
-                "http://localhost:8080",
-                "http://localhost:8081",
-                "http://localhost:19006"
-            )
-        );
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "http://localhost:8080",
+            "http://localhost:8081",
+            "http://localhost:19006"
+        ));
 
         // MÉTODOS
-        configuration.setAllowedMethods(
-            Arrays.asList(
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "OPTIONS"
-            )
-        );
+        configuration.setAllowedMethods(Arrays.asList(
+            "GET", "POST", "PUT", "DELETE", "OPTIONS"
+        ));
 
         // HEADERS
-        configuration.setAllowedHeaders(
-            Arrays.asList(
-                "*"
-            )
-        );
+        configuration.setAllowedHeaders(Arrays.asList("*"));
 
         // CREDENCIAIS
         configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
-
-        source.registerCorsConfiguration(
-            "/**",
-            configuration
-        );
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
 
         return source;
     }
