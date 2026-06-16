@@ -39,6 +39,6 @@ public class Material extends EntidadeAuditavel {
     @Column(precision = 10, scale = 2)
     private BigDecimal valor;
     
-    @Column(length = 255)
-    private String imagemUrl;
+    @Column(name = "imagem")
+    private String imagem;
 }

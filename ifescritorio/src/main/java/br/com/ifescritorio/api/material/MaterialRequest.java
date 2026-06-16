@@ -36,8 +36,8 @@ public class MaterialRequest {
 
     private BigDecimal valor;
     
-    private String imagemUrl;
-
+    private String imagem;
+    
     public Material build() {
 
         Categoria categoria = new Categoria();
@@ -53,7 +53,7 @@ public class MaterialRequest {
             .categoria(categoria)
             .local(local)
             .valor(valor)
-            .imagemUrl(imagemUrl)
+            .imagem(imagem)
             .build();
     }
 }
