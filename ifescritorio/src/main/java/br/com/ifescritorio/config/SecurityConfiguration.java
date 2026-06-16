@@ -208,12 +208,13 @@ public class SecurityConfiguration {
             new CorsConfiguration();
 
         // FRONTENDS
-        configuration.setAllowedOrigins(
-            Arrays.asList(
-                "http://localhost:3000",
-                "http://localhost:5173"
-            )
-        );
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+        	    "http://localhost:3000",
+        	    "http://localhost:5173",
+        	    "http://localhost:8081",
+        	    "https://*.exp.direct",
+        	    "https://*.ngrok-free.app"
+        	));
 
         // MÉTODOS
         configuration.setAllowedMethods(
