@@ -1,9 +1,6 @@
 package br.com.ifescritorio.config;
 
-
 import java.util.Arrays;
-import java.util.List;
-
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,236 +15,263 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-
 import br.com.ifescritorio.seguranca.JwtAuthenticationFilter;
-
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-
     public SecurityConfiguration(
-        JwtAuthenticationFilter jwtAuthenticationFilter,
-        AuthenticationProvider authenticationProvider
-    ) {
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            AuthenticationProvider authenticationProvider) {
+
         this.authenticationProvider = authenticationProvider;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http) throws Exception {
+
         http
-            // ============================
-            // CORS
-            // ============================
+
             .cors(cors ->
-                cors.configurationSource(corsConfigurationSource())
+                cors.configurationSource(
+                    corsConfigurationSource()
+                )
             )
-           
-            // ============================
-            // CSRF
-            // ============================
+
             .csrf(csrf -> csrf.disable())
 
-
-            // ============================
-            // AUTORIZAÇÃO
-            // ============================
             .authorizeHttpRequests(auth -> auth
-               
-                // LIBERA OPTIONS
+
+                // OPTIONS
                 .requestMatchers(
-                    HttpMethod.OPTIONS,
-                    "/**"
-                ).permitAll()
+                        HttpMethod.OPTIONS,
+                        "/**")
+                .permitAll()
 
+                // ERROR
+                .requestMatchers("/error")
+                .permitAll()
 
-                // ERROS INTERNOS
-                .requestMatchers("/error").permitAll()
-
-
-                // ============================
                 // AUTH
-                // ============================
-                .requestMatchers(
-                    "/api/auth/**"
-                ).permitAll()
+                .requestMatchers("/api/auth/**")
+                .permitAll()
 
-
-                // ============================
                 // CADASTRO USUÁRIO
-                // ============================
                 .requestMatchers(
-                    HttpMethod.POST,
-                    "/api/usuario"
-                ).permitAll()
+                        HttpMethod.POST,
+                        "/api/usuario")
+                .permitAll()
 
-
-                // ============================
                 // SWAGGER
-                // ============================
                 .requestMatchers(
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**"
-                ).permitAll()
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**")
+                .permitAll()
 
-
-                // ============================
-                // IMAGENS (ACESSO PÚBLICO)
-                // ============================
+                // IMAGENS
                 .requestMatchers(
-                    "/imagens/**"
-                ).permitAll()
+                        "/imagens/**")
+                .permitAll()
 
-
-                // ============================
+                // ==========================
                 // MATERIAL
-                // ============================
-               
-                // LISTAR
+                // ==========================
+
                 .requestMatchers(
-                    HttpMethod.GET,
-                    "/api/material/**"
-                ).hasAnyRole("ADM", "CLIENTE")
+                        HttpMethod.GET,
+                        "/api/material/**")
+                .hasAnyRole("ADM", "CLIENTE")
 
-
-                // CRIAR
                 .requestMatchers(
-                    HttpMethod.POST,
-                    "/api/material/**"
-                ).hasRole("ADM")
+                        HttpMethod.POST,
+                        "/api/material/**")
+                .hasRole("ADM")
 
-
-                // EDITAR
                 .requestMatchers(
-                    HttpMethod.PUT,
-                    "/api/material/**"
-                ).hasRole("ADM")
+                        HttpMethod.PUT,
+                        "/api/material/**")
+                .hasRole("ADM")
 
-
-                // DELETAR
                 .requestMatchers(
-                    HttpMethod.DELETE,
-                    "/api/material/**"
-                ).hasRole("ADM")
+                        HttpMethod.DELETE,
+                        "/api/material/**")
+                .hasRole("ADM")
 
+                // ==========================
+                // PATRIMÔNIO
+                // ==========================
 
-                // ============================
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/patrimonio/**")
+                .hasAnyRole("ADM", "CLIENTE")
+
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/patrimonio/**")
+                .hasRole("ADM")
+
+                .requestMatchers(
+                        HttpMethod.PUT,
+                        "/api/patrimonio/**")
+                .hasRole("ADM")
+
+                .requestMatchers(
+                        HttpMethod.DELETE,
+                        "/api/patrimonio/**")
+                .hasRole("ADM")
+
+                // ==========================
                 // CATEGORIA
-                // ============================
-               
-                // LISTAR
+                // ==========================
+
                 .requestMatchers(
-                    HttpMethod.GET,
-                    "/api/categoria/**"
-                ).hasAnyRole("ADM", "CLIENTE")
+                        HttpMethod.GET,
+                        "/api/categoria/**")
+                .hasAnyRole("ADM", "CLIENTE")
 
-
-                // CRIAR
                 .requestMatchers(
-                    HttpMethod.POST,
-                    "/api/categoria/**"
-                ).hasRole("ADM")
+                        HttpMethod.POST,
+                        "/api/categoria/**")
+                .hasRole("ADM")
 
-
-                // EDITAR
                 .requestMatchers(
-                    HttpMethod.PUT,
-                    "/api/categoria/**"
-                ).hasRole("ADM")
+                        HttpMethod.PUT,
+                        "/api/categoria/**")
+                .hasRole("ADM")
 
-
-                // DELETAR
                 .requestMatchers(
-                    HttpMethod.DELETE,
-                    "/api/categoria/**"
-                ).hasRole("ADM")
+                        HttpMethod.DELETE,
+                        "/api/categoria/**")
+                .hasRole("ADM")
 
+                // ==========================
+                // MOVIMENTAÇÃO
+                // ==========================
 
-                // ============================
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/movimentacao/**")
+                .hasAnyRole("ADM", "CLIENTE")
+
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/movimentacao/**")
+                .hasRole("ADM")
+
+                // ==========================
+                // SOLICITAÇÃO MOVIMENTAÇÃO
+                // ==========================
+
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/solicitacao-movimentacao/solicitar")
+                .hasAnyRole("ADM", "CLIENTE")
+
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/solicitacao-movimentacao/**")
+                .hasRole("ADM")
+
+                .requestMatchers(
+                        HttpMethod.PUT,
+                        "/api/solicitacao-movimentacao/**")
+                .hasRole("ADM")
+
+                // ==========================
+                // MANUTENÇÃO
+                // ==========================
+
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/manutencao/solicitar")
+                .hasAnyRole("ADM", "CLIENTE")
+
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/manutencao/**")
+                .hasAnyRole("ADM", "CLIENTE")
+
+                .requestMatchers(
+                        HttpMethod.PUT,
+                        "/api/manutencao/**")
+                .hasRole("ADM")
+
                 // RESTANTE
-                // ============================
-                .anyRequest().authenticated()
+                .anyRequest()
+                .authenticated()
             )
 
-
-            // ============================
-            // SESSION
-            // ============================
             .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                session.sessionCreationPolicy(
+                    SessionCreationPolicy.STATELESS
+                )
             )
 
+            .authenticationProvider(
+                authenticationProvider
+            )
 
-            // ============================
-            // PROVIDER
-            // ============================
-            .authenticationProvider(authenticationProvider)
-
-
-            // ============================
-            // JWT FILTER
-            // ============================
             .addFilterBefore(
                 jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class
             );
 
-
         return http.build();
     }
 
-
-    // ============================
-    // CORS CONFIG
-    // ============================
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
+        CorsConfiguration configuration =
+                new CorsConfiguration();
 
-        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(
+                Arrays.asList(
+                        "http://localhost:3000",
+                        "http://localhost:5173",
+                        "http://localhost:8081",
+                        "https://*.exp.direct",
+                        "https://*.ngrok-free.app",
+                        "https://*.ngrok-free.dev"
+                )
+        );
 
+        configuration.setAllowedMethods(
+                Arrays.asList(
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "DELETE",
+                        "OPTIONS"
+                )
+        );
 
-        // FRONTENDS
-        configuration.setAllowedOriginPatterns(Arrays.asList(
-        "http://localhost:3000",
-            "http://localhost:5173",
-            "http://localhost:8081",
-            "https://*.exp.direct",
-            "https://*.ngrok-free.app",
-            "https://*.ngrok-free.dev"
-        ));
+        configuration.setAllowedHeaders(
+                Arrays.asList("*")
+        );
 
+        configuration.setExposedHeaders(
+                Arrays.asList(
+                        "Authorization"
+                )
+        );
 
-        // MÉTODOS
-        configuration.setAllowedMethods(Arrays.asList(
-            "GET",
-            "POST",
-            "PUT",
-            "DELETE",
-            "OPTIONS"
-        ));
-
-
-        // HEADERS
-        configuration.setAllowedHeaders(Arrays.asList(
-            "*"
-        ));
-
-
-        // CREDENCIAIS
         configuration.setAllowCredentials(true);
 
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-
+        source.registerCorsConfiguration(
+                "/**",
+                configuration
+        );
 
         return source;
     }

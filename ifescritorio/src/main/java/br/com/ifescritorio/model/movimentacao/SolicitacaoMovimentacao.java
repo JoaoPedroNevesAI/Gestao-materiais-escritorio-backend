@@ -3,11 +3,21 @@ package br.com.ifescritorio.model.movimentacao;
 import java.time.LocalDateTime;
 
 import br.com.ifescritorio.model.local.Local;
-import br.com.ifescritorio.model.material.Material;
+import br.com.ifescritorio.model.patrimonio.Patrimonio;
 import br.com.ifescritorio.model.usuario.Usuario;
 import br.com.ifescritorio.util.entity.EntidadeAuditavel;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "solicitacao_movimentacao")
@@ -18,9 +28,9 @@ import lombok.*;
 @AllArgsConstructor
 public class SolicitacaoMovimentacao extends EntidadeAuditavel {
 
-    @ManyToOne
-    @JoinColumn(name = "material_id", nullable = false)
-    private Material material;
+	@ManyToOne
+	@JoinColumn(name = "patrimonio_id", nullable = false)
+	private Patrimonio patrimonio;
 
     @ManyToOne
     @JoinColumn(name = "local_origem_id", nullable = false)

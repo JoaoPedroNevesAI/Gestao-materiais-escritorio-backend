@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 public class MovimentacaoRequest {
 
-    @NotNull
-    private Long materialId;
+	@NotNull
+	private Long patrimonioId;
 
     @NotNull
     private Long localDestinoId;

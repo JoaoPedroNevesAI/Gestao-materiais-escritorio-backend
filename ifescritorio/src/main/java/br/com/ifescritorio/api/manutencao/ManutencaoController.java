@@ -38,7 +38,7 @@ public class ManutencaoController {
                         .orElse(null);
 
         return service.solicitar(
-                request.getMaterialId(),
+                request.getPatrimonioId(),
                 request.getDescricao(),
                 usuario);
     }
@@ -69,10 +69,10 @@ public class ManutencaoController {
         return service.listarPendentes();
     }
 
-    @GetMapping("/material/{id}")
-    public List<Manutencao> listarPorMaterial(
+    @GetMapping("/patrimonio/{id}")
+    public List<Manutencao> listarPorPatrimonio(
             @PathVariable Long id) {
 
-        return service.listarPorMaterial(id);
+        return service.listarPorPatrimonio(id);
     }
 }

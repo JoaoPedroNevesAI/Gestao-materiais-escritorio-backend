@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 public class ManutencaoRequest {
 
-    @NotNull
-    private Long materialId;
+	@NotNull
+	private Long patrimonioId;
 
     @NotBlank
     private String descricao;

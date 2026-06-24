@@ -10,6 +10,9 @@ import br.com.ifescritorio.model.categoria.Categoria;
 import br.com.ifescritorio.model.categoria.CategoriaRepository;
 import br.com.ifescritorio.model.local.Local;
 import br.com.ifescritorio.model.local.LocalRepository;
+import br.com.ifescritorio.model.patrimonio.Patrimonio;
+import br.com.ifescritorio.model.patrimonio.PatrimonioRepository;
+import br.com.ifescritorio.model.patrimonio.StatusPatrimonio;
 import br.com.ifescritorio.util.Util;
 import br.com.ifescritorio.util.exception.EntidadeNaoEncontradaException;
 import jakarta.transaction.Transactional;
@@ -25,6 +28,9 @@ public class MaterialService {
 
     @Autowired
     private LocalRepository localRepository;
+
+    @Autowired
+    private PatrimonioRepository patrimonioRepository;
 
     @Transactional
     public Material save(Material material) {
@@ -49,7 +55,12 @@ public class MaterialService {
         material.setLocal(local);
         material.setHabilitado(Boolean.TRUE);
 
-        return repository.save(material);
+        Material materialSalvo =
+                repository.save(material);
+
+        gerarPatrimonios(materialSalvo);
+
+        return materialSalvo;
     }
 
     @Transactional
@@ -209,5 +220,38 @@ public class MaterialService {
         }
 
         return listaMateriais;
+    }
+
+    private void gerarPatrimonios(
+            Material material) {
+
+        for (int i = 0; i < material.getQuantidade(); i++) {
+
+            Patrimonio patrimonio =
+                    Patrimonio.builder()
+                            .material(material)
+                            .local(material.getLocal())
+                            .status(StatusPatrimonio.DISPONIVEL)
+                            .observacao("Gerado automaticamente")
+                            .build();
+
+            patrimonio =
+                    patrimonioRepository.save(
+                            patrimonio);
+
+            String codigo =
+                    String.format(
+                            "PAT-%06d",
+                            patrimonio.getId());
+
+            patrimonio.setCodigoPatrimonio(
+                    codigo);
+
+            patrimonio.setQrCode(
+                    codigo);
+
+            patrimonioRepository.save(
+                    patrimonio);
+        }
     }
 }

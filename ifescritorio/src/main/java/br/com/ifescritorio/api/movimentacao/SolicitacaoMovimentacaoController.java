@@ -38,7 +38,7 @@ public class SolicitacaoMovimentacaoController {
                         .orElse(null);
 
         return service.solicitar(
-                request.getMaterialId(),
+                request.getPatrimonioId(),
                 request.getLocalDestinoId(),
                 request.getObservacao(),
                 usuario);

@@ -27,7 +27,7 @@ public class MaterialRequest {
     @NotNull(message = "Quantidade é obrigatória")
     @Min(value = 1, message = "Quantidade deve ser no mínimo 1")
     private Integer quantidade;
-    
+
     @NotNull(message = "Categoria é obrigatória")
     private Long categoriaId;
 
@@ -35,9 +35,9 @@ public class MaterialRequest {
     private Long localId;
 
     private BigDecimal valor;
-    
+
     private String imagem;
-    
+
     public Material build() {
 
         Categoria categoria = new Categoria();
@@ -47,13 +47,13 @@ public class MaterialRequest {
         local.setId(localId);
 
         return Material.builder()
-            .nome(nome)
-            .descricao(descricao)
-            .quantidade(quantidade)
-            .categoria(categoria)
-            .local(local)
-            .valor(valor)
-            .imagem(imagem)
-            .build();
+                .nome(nome)
+                .descricao(descricao)
+                .quantidade(quantidade)
+                .categoria(categoria)
+                .local(local)
+                .valor(valor)
+                .imagem(imagem)
+                .build();
     }
 }

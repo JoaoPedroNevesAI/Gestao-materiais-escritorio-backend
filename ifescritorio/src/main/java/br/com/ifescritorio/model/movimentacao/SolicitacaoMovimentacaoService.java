@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 import br.com.ifescritorio.model.local.Local;
 import br.com.ifescritorio.model.local.LocalRepository;
-import br.com.ifescritorio.model.material.Material;
-import br.com.ifescritorio.model.material.MaterialRepository;
+import br.com.ifescritorio.model.patrimonio.Patrimonio;
+import br.com.ifescritorio.model.patrimonio.PatrimonioRepository;
 import br.com.ifescritorio.model.usuario.Usuario;
 import br.com.ifescritorio.util.exception.EntidadeNaoEncontradaException;
 
@@ -20,7 +20,7 @@ public class SolicitacaoMovimentacaoService {
     private SolicitacaoMovimentacaoRepository repository;
 
     @Autowired
-    private MaterialRepository materialRepository;
+    private PatrimonioRepository patrimonioRepository;
 
     @Autowired
     private LocalRepository localRepository;
@@ -29,17 +29,17 @@ public class SolicitacaoMovimentacaoService {
     private MovimentacaoService movimentacaoService;
 
     public SolicitacaoMovimentacao solicitar(
-            Long materialId,
+            Long patrimonioId,
             Long localDestinoId,
             String observacao,
             Usuario solicitante) {
 
-        Material material =
-                materialRepository.findById(materialId)
+        Patrimonio patrimonio =
+                patrimonioRepository.findById(patrimonioId)
                         .orElseThrow(() ->
                                 new EntidadeNaoEncontradaException(
-                                        "Material",
-                                        materialId));
+                                        "Patrimonio",
+                                        patrimonioId));
 
         Local destino =
                 localRepository.findById(localDestinoId)
@@ -50,8 +50,8 @@ public class SolicitacaoMovimentacaoService {
 
         SolicitacaoMovimentacao solicitacao =
                 SolicitacaoMovimentacao.builder()
-                        .material(material)
-                        .localOrigem(material.getLocal())
+                        .patrimonio(patrimonio)
+                        .localOrigem(patrimonio.getLocal())
                         .localDestino(destino)
                         .solicitante(solicitante)
                         .observacao(observacao)
@@ -75,7 +75,7 @@ public class SolicitacaoMovimentacaoService {
                                         id));
 
         movimentacaoService.transferir(
-                solicitacao.getMaterial().getId(),
+                solicitacao.getPatrimonio().getId(),
                 solicitacao.getLocalDestino().getId(),
                 solicitacao.getObservacao(),
                 admin);

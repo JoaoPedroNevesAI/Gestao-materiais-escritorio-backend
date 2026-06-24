@@ -2,125 +2,122 @@ package br.com.ifescritorio.api.material;
 
 import java.util.List;
 
-
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import br.com.ifescritorio.model.material.Material;
-import br.com.ifescritorio.model.material.MaterialService;
-import jakarta.validation.Valid;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.com.ifescritorio.model.material.Material;
+import br.com.ifescritorio.model.material.MaterialService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/material")
 @CrossOrigin
 public class MaterialController {
 
-   @Autowired
-   private MaterialService materialService;
+    @Autowired
+    private MaterialService materialService;
 
-   @PostMapping
-   public ResponseEntity<Material> save(
-       @RequestBody @Valid MaterialRequest request
-   ) {
+    @PostMapping
+    public ResponseEntity<Material> save(
+            @RequestBody @Valid MaterialRequest request) {
 
-       Authentication auth =
-           SecurityContextHolder.getContext().getAuthentication();
+        Authentication auth =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
 
-       System.out.println("================================");
-       System.out.println("AUTH = " + auth);
-       System.out.println("USER = " + auth.getName());
-       System.out.println("ROLES = " + auth.getAuthorities());
-       System.out.println("================================");
+        System.out.println("================================");
+        System.out.println("AUTH = " + auth);
+        System.out.println("USER = " + auth.getName());
+        System.out.println("ROLES = " + auth.getAuthorities());
+        System.out.println("================================");
 
-       Material material =
-           materialService.save(request.build());
+        Material material =
+                materialService.save(
+                        request.build());
 
-       return new ResponseEntity<>(
-           material,
-           HttpStatus.CREATED
-       );
-   }
+        return new ResponseEntity<>(
+                material,
+                HttpStatus.CREATED);
+    }
 
-   @GetMapping
-   public List<Material> listarTodos() {
-       return materialService.listarTodos();
-   }
+    @GetMapping
+    public List<Material> listarTodos() {
 
-   @GetMapping("/{id}")
-   public Material obterPorID(@PathVariable Long id) {
-       return materialService.obterPorID(id);
-   }
-   
-   @PutMapping("/{id}")
-   public ResponseEntity<Material> update(@PathVariable Long id, @RequestBody @Valid MaterialRequest request) {
+        return materialService.listarTodos();
+    }
 
-       materialService.update(id, request.build());
+    @GetMapping("/{id}")
+    public Material obterPorID(
+            @PathVariable Long id) {
 
-       return ResponseEntity.ok().build();
-   }
-   
-   @DeleteMapping("/{id}")
-   public ResponseEntity<Void> delete(@PathVariable Long id) {
-       materialService.delete(id);
-       return ResponseEntity.noContent().build();
-   }
-   
-   @PostMapping("/filtrar")
-   public List<Material> filtrar(
+        return materialService.obterPorID(id);
+    }
 
-       @RequestParam(
-           value = "nome",
-           required = false
-       )
-       String nome,
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> update(
+            @PathVariable Long id,
+            @RequestBody @Valid MaterialRequest request) {
 
-       @RequestParam(
-           value = "idCategoria",
-           required = false
-       )
-       Long idCategoria,
+        materialService.update(
+                id,
+                request.build());
 
-       @RequestParam(
-           value = "idLocal",
-           required = false
-       )
-       Long idLocal
-   ) {
+        return ResponseEntity.ok().build();
+    }
 
-       return materialService.filtrar(
-           nome,
-           idCategoria,
-           idLocal
-       );
-   }
-   
-   @PostMapping("/{id}/imagem")
-   public ResponseEntity<Material> uploadImagem(
-           @PathVariable Long id,
-           @RequestParam("imagem")
-           MultipartFile imagem) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id) {
 
-       Material material =
-               materialService.salvarImagem(id, imagem);
+        materialService.delete(id);
 
-       return ResponseEntity.ok(material);
-   }
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/filtrar")
+    public List<Material> filtrar(
+
+            @RequestParam(
+                    value = "nome",
+                    required = false)
+            String nome,
+
+            @RequestParam(
+                    value = "idCategoria",
+                    required = false)
+            Long idCategoria,
+
+            @RequestParam(
+                    value = "idLocal",
+                    required = false)
+            Long idLocal) {
+
+        return materialService.filtrar(
+                nome,
+                idCategoria,
+                idLocal);
+    }
+
+    @PostMapping("/{id}/imagem")
+    public ResponseEntity<Material> uploadImagem(
+            @PathVariable Long id,
+            @RequestParam("imagem")
+            MultipartFile imagem) {
+
+        Material material =
+                materialService.salvarImagem(
+                        id,
+                        imagem);
+
+        return ResponseEntity.ok(material);
+    }
 }

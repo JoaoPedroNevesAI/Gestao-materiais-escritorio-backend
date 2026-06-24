@@ -38,16 +38,16 @@ public class MovimentacaoController {
                         .orElse(null);
 
         return service.transferir(
-                request.getMaterialId(),
+                request.getPatrimonioId(),
                 request.getLocalDestinoId(),
                 request.getObservacao(),
                 usuario);
     }
 
-    @GetMapping("/material/{id}")
-    public List<Movimentacao> listarPorMaterial(
+    @GetMapping("/patrimonio/{id}")
+    public List<Movimentacao> listarPorPatrimonio(
             @PathVariable Long id) {
 
-        return service.listarPorMaterial(id);
+        return service.listarPorPatrimonio(id);
     }
 }
