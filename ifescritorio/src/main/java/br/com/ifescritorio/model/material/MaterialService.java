@@ -13,6 +13,7 @@ import br.com.ifescritorio.model.local.LocalRepository;
 import br.com.ifescritorio.model.patrimonio.Patrimonio;
 import br.com.ifescritorio.model.patrimonio.PatrimonioRepository;
 import br.com.ifescritorio.model.patrimonio.StatusPatrimonio;
+import br.com.ifescritorio.util.QrCodeUtil;
 import br.com.ifescritorio.util.Util;
 import br.com.ifescritorio.util.exception.EntidadeNaoEncontradaException;
 import jakarta.transaction.Transactional;
@@ -247,8 +248,13 @@ public class MaterialService {
             patrimonio.setCodigoPatrimonio(
                     codigo);
 
+            String qrCodeImagem =
+                    QrCodeUtil.gerarQRCode(
+                            codigo,
+                            codigo);
+
             patrimonio.setQrCode(
-                    codigo);
+                    qrCodeImagem);
 
             patrimonioRepository.save(
                     patrimonio);
