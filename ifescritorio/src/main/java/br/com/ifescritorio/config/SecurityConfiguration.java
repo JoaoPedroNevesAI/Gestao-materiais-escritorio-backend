@@ -70,8 +70,10 @@ public class SecurityConfiguration {
 
                 // SWAGGER
                 .requestMatchers(
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**")
+                	    "/swagger-ui/**",
+                	    "/v3/api-docs/**",
+                	    "/api-docs/**",
+                	    "/api-docs")
                 .permitAll()
 
                 // IMAGENS

@@ -15,16 +15,27 @@ import org.springframework.web.multipart.MultipartFile;
 import br.com.ifescritorio.model.material.Material;
 import br.com.ifescritorio.model.material.MaterialService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/material")
 @CrossOrigin
+@Tag(
+    name = "API Material",
+    description = "API responsável pelo gerenciamento de materiais do sistema"
+)
 public class MaterialController {
 
     @Autowired
     private MaterialService materialService;
 
+    @Operation(
+        summary = "Cadastrar material",
+        description = "Realiza o cadastro de um novo material e gera automaticamente os patrimônios correspondentes à quantidade informada."
+    )
     @PostMapping
     public ResponseEntity<Material> save(
             @RequestBody @Valid MaterialRequest request) {
@@ -49,12 +60,20 @@ public class MaterialController {
                 HttpStatus.CREATED);
     }
 
+    @Operation(
+        summary = "Listar materiais",
+        description = "Retorna todos os materiais cadastrados no sistema."
+    )
     @GetMapping
     public List<Material> listarTodos() {
 
         return materialService.listarTodos();
     }
 
+    @Operation(
+        summary = "Buscar material por ID",
+        description = "Retorna um material específico a partir do seu identificador."
+    )
     @GetMapping("/{id}")
     public Material obterPorID(
             @PathVariable Long id) {
@@ -62,6 +81,10 @@ public class MaterialController {
         return materialService.obterPorID(id);
     }
 
+    @Operation(
+        summary = "Atualizar material",
+        description = "Atualiza os dados de um material existente."
+    )
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(
             @PathVariable Long id,
@@ -74,6 +97,10 @@ public class MaterialController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+        summary = "Excluir material",
+        description = "Realiza a exclusão lógica de um material."
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable Long id) {
@@ -83,6 +110,10 @@ public class MaterialController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+        summary = "Filtrar materiais",
+        description = "Permite filtrar materiais por nome, categoria e local."
+    )
     @PostMapping("/filtrar")
     public List<Material> filtrar(
 
@@ -107,6 +138,10 @@ public class MaterialController {
                 idLocal);
     }
 
+    @Operation(
+        summary = "Enviar imagem do material",
+        description = "Realiza o upload da imagem associada a um material."
+    )
     @PostMapping("/{id}/imagem")
     public ResponseEntity<Material> uploadImagem(
             @PathVariable Long id,

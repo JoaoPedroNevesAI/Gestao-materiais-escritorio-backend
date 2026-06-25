@@ -41,4 +41,26 @@ public class PatrimonioService {
 
         repository.save(patrimonio);
     }
+    
+    public Patrimonio obterPorCodigo(
+            String codigo) {
+
+        return repository
+                .findByCodigoPatrimonio(codigo)
+                .orElseThrow(() ->
+                        new EntidadeNaoEncontradaException(
+                                "Patrimonio",
+                                codigo));
+    }
+
+    public Patrimonio obterPorQrCode(
+            String qrCode) {
+
+        return repository
+                .findByQrCode(qrCode)
+                .orElseThrow(() ->
+                        new EntidadeNaoEncontradaException(
+                                "Patrimonio",
+                                qrCode));
+    }
 }

@@ -11,9 +11,16 @@ import br.com.ifescritorio.model.movimentacao.SolicitacaoMovimentacaoService;
 import br.com.ifescritorio.model.usuario.Usuario;
 import br.com.ifescritorio.model.usuario.UsuarioRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/solicitacao-movimentacao")
 @CrossOrigin
+@Tag(
+    name = "API Solicitação de Movimentação",
+    description = "API responsável pelas solicitações de transferência de patrimônios entre locais"
+)
 public class SolicitacaoMovimentacaoController {
 
     @Autowired
@@ -22,6 +29,10 @@ public class SolicitacaoMovimentacaoController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Operation(
+        summary = "Solicitar movimentação",
+        description = "Cria uma solicitação de transferência de um patrimônio para outro local."
+    )
     @PostMapping("/solicitar")
     public SolicitacaoMovimentacao solicitar(
             @RequestBody SolicitarMovimentacaoRequest request) {
@@ -44,12 +55,20 @@ public class SolicitacaoMovimentacaoController {
                 usuario);
     }
 
+    @Operation(
+        summary = "Listar solicitações pendentes",
+        description = "Retorna todas as solicitações de movimentação que aguardam aprovação."
+    )
     @GetMapping("/pendentes")
     public List<SolicitacaoMovimentacao> pendentes() {
 
         return service.listarPendentes();
     }
 
+    @Operation(
+        summary = "Aprovar solicitação",
+        description = "Aprova uma solicitação de movimentação e realiza a transferência do patrimônio."
+    )
     @PutMapping("/{id}/aprovar")
     public SolicitacaoMovimentacao aprovar(
             @PathVariable Long id,
@@ -72,6 +91,10 @@ public class SolicitacaoMovimentacaoController {
                 admin);
     }
 
+    @Operation(
+        summary = "Reprovar solicitação",
+        description = "Reprova uma solicitação de movimentação informando o motivo."
+    )
     @PutMapping("/{id}/reprovar")
     public SolicitacaoMovimentacao reprovar(
             @PathVariable Long id,

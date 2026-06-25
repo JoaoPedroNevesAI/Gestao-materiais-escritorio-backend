@@ -9,4 +9,7 @@ public interface PatrimonioRepository
 
     Optional<Patrimonio> findByCodigoPatrimonio(
             String codigoPatrimonio);
+
+    Optional<Patrimonio> findByQrCode(
+            String qrCode);
 }

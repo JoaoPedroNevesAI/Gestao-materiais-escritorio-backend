@@ -11,9 +11,16 @@ import br.com.ifescritorio.model.movimentacao.MovimentacaoService;
 import br.com.ifescritorio.model.usuario.Usuario;
 import br.com.ifescritorio.model.usuario.UsuarioRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/movimentacao")
 @CrossOrigin
+@Tag(
+    name = "API Movimentação",
+    description = "API responsável pelas transferências e histórico de movimentações dos patrimônios"
+)
 public class MovimentacaoController {
 
     @Autowired
@@ -22,6 +29,10 @@ public class MovimentacaoController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Operation(
+        summary = "Transferir patrimônio",
+        description = "Realiza a transferência de um patrimônio para outro local e registra a movimentação."
+    )
     @PostMapping("/transferir")
     public Movimentacao transferir(
             @RequestBody MovimentacaoRequest request) {
@@ -44,6 +55,10 @@ public class MovimentacaoController {
                 usuario);
     }
 
+    @Operation(
+        summary = "Histórico de movimentações",
+        description = "Lista todas as movimentações registradas para um patrimônio específico."
+    )
     @GetMapping("/patrimonio/{id}")
     public List<Movimentacao> listarPorPatrimonio(
             @PathVariable Long id) {
