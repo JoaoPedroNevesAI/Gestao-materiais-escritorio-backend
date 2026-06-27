@@ -88,7 +88,7 @@ public class SecurityConfiguration {
                 .requestMatchers(
                         HttpMethod.GET,
                         "/api/material/**")
-                .hasAnyRole("ADM", "CLIENTE")
+                .hasAnyRole("ADM", "COLABORADOR")
 
                 .requestMatchers(
                         HttpMethod.POST,
@@ -112,7 +112,7 @@ public class SecurityConfiguration {
                 .requestMatchers(
                         HttpMethod.GET,
                         "/api/patrimonio/**")
-                .hasAnyRole("ADM", "CLIENTE")
+                .hasAnyRole("ADM", "COLABORADOR")
 
                 .requestMatchers(
                         HttpMethod.POST,
@@ -136,7 +136,7 @@ public class SecurityConfiguration {
                 .requestMatchers(
                         HttpMethod.GET,
                         "/api/categoria/**")
-                .hasAnyRole("ADM", "CLIENTE")
+                .hasAnyRole("ADM", "COLABORADOR")
 
                 .requestMatchers(
                         HttpMethod.POST,
@@ -160,7 +160,7 @@ public class SecurityConfiguration {
                 .requestMatchers(
                         HttpMethod.GET,
                         "/api/movimentacao/**")
-                .hasAnyRole("ADM", "CLIENTE")
+                .hasAnyRole("ADM", "COLABORADOR")
 
                 .requestMatchers(
                         HttpMethod.POST,
@@ -174,7 +174,7 @@ public class SecurityConfiguration {
                 .requestMatchers(
                         HttpMethod.POST,
                         "/api/solicitacao-movimentacao/solicitar")
-                .hasAnyRole("ADM", "CLIENTE")
+                .hasAnyRole("ADM", "COLABORADOR")
 
                 .requestMatchers(
                         HttpMethod.GET,
@@ -193,12 +193,12 @@ public class SecurityConfiguration {
                 .requestMatchers(
                         HttpMethod.POST,
                         "/api/manutencao/solicitar")
-                .hasAnyRole("ADM", "CLIENTE")
+                .hasAnyRole("ADM", "COLABORADOR")
 
                 .requestMatchers(
                         HttpMethod.GET,
                         "/api/manutencao/**")
-                .hasAnyRole("ADM", "CLIENTE")
+                .hasAnyRole("ADM", "COLABORADOR")
 
                 .requestMatchers(
                         HttpMethod.PUT,
