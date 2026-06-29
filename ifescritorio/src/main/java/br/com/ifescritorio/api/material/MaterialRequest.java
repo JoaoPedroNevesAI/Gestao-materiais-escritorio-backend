@@ -1,0 +1,59 @@
+package br.com.ifescritorio.api.material;
+
+import java.math.BigDecimal;
+
+import br.com.ifescritorio.model.categoria.Categoria;
+import br.com.ifescritorio.model.local.Local;
+import br.com.ifescritorio.model.material.Material;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class MaterialRequest {
+
+    @NotBlank(message = "Nome é obrigatório")
+    private String nome;
+
+    private String descricao;
+
+    @NotNull(message = "Quantidade é obrigatória")
+    @Min(value = 1, message = "Quantidade deve ser no mínimo 1")
+    private Integer quantidade;
+
+    @NotNull(message = "Categoria é obrigatória")
+    private Long categoriaId;
+
+    @NotNull(message = "Local é obrigatório")
+    private Long localId;
+
+    private BigDecimal valor;
+
+    private String imagem;
+
+    public Material build() {
+
+        Categoria categoria = new Categoria();
+        categoria.setId(categoriaId);
+
+        Local local = new Local();
+        local.setId(localId);
+
+        return Material.builder()
+                .nome(nome)
+                .descricao(descricao)
+                .quantidade(quantidade)
+                .categoria(categoria)
+                .local(local)
+                .valor(valor)
+                .imagem(imagem)
+                .build();
+    }
+}
