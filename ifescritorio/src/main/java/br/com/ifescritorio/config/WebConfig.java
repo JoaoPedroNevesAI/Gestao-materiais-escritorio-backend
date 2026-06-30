@@ -21,5 +21,8 @@ public class WebConfig implements WebMvcConfigurer {
 
         registry.addResourceHandler("/imagens/**")
                 .addResourceLocations("file:C:/ifes-patrimonio/uploads/");
+        
+        registry.addResourceHandler("/qrcodes/**")
+        .addResourceLocations("file:C:/ifes-patrimonio/uploads/qrcodes/");
     }
 }

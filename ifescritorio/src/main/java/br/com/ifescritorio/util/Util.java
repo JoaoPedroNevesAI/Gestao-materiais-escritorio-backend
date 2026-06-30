@@ -47,6 +47,8 @@ public class Util {
                                 + File.separator
                                 + nomeArquivoComDataHora);
 
+                System.out.println(serverFile.getAbsolutePath());
+
                 BufferedOutputStream stream =
                         new BufferedOutputStream(
                                 new FileOutputStream(serverFile));

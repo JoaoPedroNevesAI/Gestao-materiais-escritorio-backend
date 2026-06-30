@@ -1,7 +1,8 @@
 package br.com.ifescritorio.util;
 
-import java.nio.file.FileSystems;
+import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -16,16 +17,24 @@ public class QrCodeUtil {
 
         try {
 
+            // Pasta onde os QR Codes serão salvos
             String pasta =
-                    "uploads/qrcodes/";
+                    Util.LOCAL_ARMAZENAMENTO_IMAGENS + "qrcodes" + File.separator;
 
-            Path path =
-                    FileSystems.getDefault()
-                            .getPath(
-                                    pasta + nomeArquivo + ".png");
+            // Cria a pasta caso ela não exista
+            File diretorio = new File(pasta);
 
-            QRCodeWriter qrCodeWriter =
-                    new QRCodeWriter();
+            if (!diretorio.exists()) {
+                diretorio.mkdirs();
+            }
+
+            // Caminho completo do arquivo
+            Path path = Paths.get(
+                    pasta,
+                    nomeArquivo + ".png");
+
+            // Geração do QR Code
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
 
             BitMatrix bitMatrix =
                     qrCodeWriter.encode(
@@ -39,9 +48,12 @@ public class QrCodeUtil {
                     "PNG",
                     path);
 
+            // Retorna apenas o nome do arquivo salvo
             return nomeArquivo + ".png";
 
         } catch (Exception e) {
+
+            e.printStackTrace();
 
             throw new RuntimeException(
                     "Erro ao gerar QR Code",
