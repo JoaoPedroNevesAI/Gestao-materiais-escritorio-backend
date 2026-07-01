@@ -52,9 +52,8 @@ public class MovimentacaoService {
                     "O patrimônio já está neste local.");
         }
 
-        patrimonio.setLocal(destino);
-
-        patrimonioRepository.save(patrimonio);
+        material.setLocal(destino);
+        materialRepository.save(material);
 
         Movimentacao movimentacao =
                 Movimentacao.builder()
@@ -69,8 +68,12 @@ public class MovimentacaoService {
         return repository.save(movimentacao);
     }
 
-    public List<Movimentacao> listarPorPatrimonio(
-            Long patrimonioId) {
+    public List<Movimentacao> listarTodas() {
+        return repository.findAllByOrderByDataMovimentacaoDesc();
+    }
+
+    public List<Movimentacao> listarPorMaterial(
+            Long materialId) {
 
         return repository
                 .findByPatrimonioIdOrderByDataMovimentacaoDesc(

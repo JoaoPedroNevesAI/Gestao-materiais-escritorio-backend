@@ -14,7 +14,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import br.com.ifescritorio.seguranca.JwtAuthenticationFilter;
 
 @Configuration
@@ -25,47 +24,38 @@ public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfiguration(
-            JwtAuthenticationFilter jwtAuthenticationFilter,
-            AuthenticationProvider authenticationProvider) {
-
+        JwtAuthenticationFilter jwtAuthenticationFilter,
+        AuthenticationProvider authenticationProvider
+    ) {
         this.authenticationProvider = authenticationProvider;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-
-            .cors(cors ->
-                cors.configurationSource(
-                    corsConfigurationSource()
-                )
-            )
+            // =========================
+            // CORS
+            // =========================
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
             .csrf(csrf -> csrf.disable())
 
             .authorizeHttpRequests(auth -> auth
 
-                // OPTIONS
-                .requestMatchers(
-                        HttpMethod.OPTIONS,
-                        "/**")
-                .permitAll()
-
-                // ERROR
-                .requestMatchers("/error")
+                // LIBERA OPTIONS
+                .requestMatchers(HttpMethod.OPTIONS, "/**")
                 .permitAll()
 
                 // AUTH
+                // =========================
                 .requestMatchers("/api/auth/**")
                 .permitAll()
 
                 // CADASTRO USUÁRIO
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/api/usuario")
+                // =========================
+                .requestMatchers(HttpMethod.POST, "/api/usuario")
                 .permitAll()
 
                 // SWAGGER
@@ -85,38 +75,24 @@ public class SecurityConfiguration {
                 // MATERIAL
                 // ==========================
 
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/api/material/**")
-                .hasAnyRole("ADM", "COLABORADOR")
+                // FILTRAR — deve vir ANTES da regra geral de POST
+                .requestMatchers(HttpMethod.POST, "/api/material/filtrar")
+                .hasAnyRole("ADM", "CLIENTE")
 
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/api/material/**")
+                // LISTAR
+                .requestMatchers(HttpMethod.GET, "/api/material/**")
+                .hasAnyRole("ADM", "CLIENTE")
+
+                // CRIAR
+                .requestMatchers(HttpMethod.POST, "/api/material/**")
                 .hasRole("ADM")
 
-                .requestMatchers(
-                        HttpMethod.PUT,
-                        "/api/material/**")
+                // EDITAR
+                .requestMatchers(HttpMethod.PUT, "/api/material/**")
                 .hasRole("ADM")
 
-                .requestMatchers(
-                        HttpMethod.DELETE,
-                        "/api/material/**")
-                .hasRole("ADM")
-
-                // ==========================
-                // PATRIMÔNIO
-                // ==========================
-
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/api/patrimonio/**")
-                .hasAnyRole("ADM", "COLABORADOR")
-
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/api/patrimonio/**")
+                // DELETAR
+                .requestMatchers(HttpMethod.DELETE, "/api/material/**")
                 .hasRole("ADM")
 
                 .requestMatchers(
@@ -133,76 +109,20 @@ public class SecurityConfiguration {
                 // CATEGORIA
                 // ==========================
 
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/api/categoria/**")
-                .hasAnyRole("ADM", "COLABORADOR")
+                // LISTAR
+                .requestMatchers(HttpMethod.GET, "/api/categoria/**")
+                .hasAnyRole("ADM", "CLIENTE")
 
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/api/categoria/**")
+                // CRIAR
+                .requestMatchers(HttpMethod.POST, "/api/categoria/**")
                 .hasRole("ADM")
 
-                .requestMatchers(
-                        HttpMethod.PUT,
-                        "/api/categoria/**")
+                // EDITAR
+                .requestMatchers(HttpMethod.PUT, "/api/categoria/**")
                 .hasRole("ADM")
 
-                .requestMatchers(
-                        HttpMethod.DELETE,
-                        "/api/categoria/**")
-                .hasRole("ADM")
-
-                // ==========================
-                // MOVIMENTAÇÃO
-                // ==========================
-
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/api/movimentacao/**")
-                .hasAnyRole("ADM", "COLABORADOR")
-
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/api/movimentacao/**")
-                .hasRole("ADM")
-
-                // ==========================
-                // SOLICITAÇÃO MOVIMENTAÇÃO
-                // ==========================
-
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/api/solicitacao-movimentacao/solicitar")
-                .hasAnyRole("ADM", "COLABORADOR")
-
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/api/solicitacao-movimentacao/**")
-                .hasRole("ADM")
-
-                .requestMatchers(
-                        HttpMethod.PUT,
-                        "/api/solicitacao-movimentacao/**")
-                .hasRole("ADM")
-
-                // ==========================
-                // MANUTENÇÃO
-                // ==========================
-
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/api/manutencao/solicitar")
-                .hasAnyRole("ADM", "COLABORADOR")
-
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/api/manutencao/**")
-                .hasAnyRole("ADM", "COLABORADOR")
-
-                .requestMatchers(
-                        HttpMethod.PUT,
-                        "/api/manutencao/**")
+                // DELETAR
+                .requestMatchers(HttpMethod.DELETE, "/api/categoria/**")
                 .hasRole("ADM")
 
                 // RESTANTE
@@ -211,14 +131,13 @@ public class SecurityConfiguration {
             )
 
             .sessionManagement(session ->
-                session.sessionCreationPolicy(
-                    SessionCreationPolicy.STATELESS
-                )
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
-            .authenticationProvider(
-                authenticationProvider
-            )
+            // =========================
+            // PROVIDER
+            // =========================
+            .authenticationProvider(authenticationProvider)
 
             .addFilterBefore(
                 jwtAuthenticationFilter,
@@ -231,49 +150,29 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
-        CorsConfiguration configuration =
-                new CorsConfiguration();
+        CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOriginPatterns(
-                Arrays.asList(
-                        "http://localhost:3000",
-                        "http://localhost:5173",
-                        "http://localhost:8081",
-                        "https://*.exp.direct",
-                        "https://*.ngrok-free.app",
-                        "https://*.ngrok-free.dev"
-                )
-        );
+        // FRONTENDS
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "http://localhost:8080",
+            "http://localhost:8081",
+            "http://localhost:19006"
+        ));
 
-        configuration.setAllowedMethods(
-                Arrays.asList(
-                        "GET",
-                        "POST",
-                        "PUT",
-                        "DELETE",
-                        "OPTIONS"
-                )
-        );
+        // MÉTODOS
+        configuration.setAllowedMethods(Arrays.asList(
+            "GET", "POST", "PUT", "DELETE", "OPTIONS"
+        ));
 
-        configuration.setAllowedHeaders(
-                Arrays.asList("*")
-        );
-
-        configuration.setExposedHeaders(
-                Arrays.asList(
-                        "Authorization"
-                )
-        );
+        // HEADERS
+        configuration.setAllowedHeaders(Arrays.asList("*"));
 
         configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
-
-        source.registerCorsConfiguration(
-                "/**",
-                configuration
-        );
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
 
         return source;
     }
