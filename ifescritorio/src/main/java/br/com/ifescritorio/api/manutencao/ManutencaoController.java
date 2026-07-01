@@ -11,9 +11,16 @@ import br.com.ifescritorio.model.manutencao.ManutencaoService;
 import br.com.ifescritorio.model.usuario.Usuario;
 import br.com.ifescritorio.model.usuario.UsuarioRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/manutencao")
 @CrossOrigin
+@Tag(
+    name = "API Manutenção",
+    description = "API responsável pelas solicitações e aprovações de manutenção dos patrimônios"
+)
 public class ManutencaoController {
 
     @Autowired
@@ -22,6 +29,10 @@ public class ManutencaoController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Operation(
+        summary = "Solicitar manutenção",
+        description = "Permite que um usuário solicite manutenção para um patrimônio."
+    )
     @PostMapping("/solicitar")
     public Manutencao solicitar(
             @RequestBody ManutencaoRequest request) {
@@ -38,11 +49,15 @@ public class ManutencaoController {
                         .orElse(null);
 
         return service.solicitar(
-                request.getMaterialId(),
+                request.getPatrimonioId(),
                 request.getDescricao(),
                 usuario);
     }
 
+    @Operation(
+        summary = "Aprovar manutenção",
+        description = "Aprova uma solicitação de manutenção pendente."
+    )
     @PutMapping("/{id}/aprovar")
     public Manutencao aprovar(
             @PathVariable Long id,
@@ -53,6 +68,10 @@ public class ManutencaoController {
                 request.getObservacaoAdmin());
     }
 
+    @Operation(
+        summary = "Reprovar manutenção",
+        description = "Reprova uma solicitação de manutenção pendente."
+    )
     @PutMapping("/{id}/reprovar")
     public Manutencao reprovar(
             @PathVariable Long id,
@@ -63,16 +82,24 @@ public class ManutencaoController {
                 request.getObservacaoAdmin());
     }
 
+    @Operation(
+        summary = "Listar manutenções pendentes",
+        description = "Retorna todas as solicitações de manutenção com status PENDENTE."
+    )
     @GetMapping("/pendentes")
     public List<Manutencao> listarPendentes() {
 
         return service.listarPendentes();
     }
 
-    @GetMapping("/material/{id}")
-    public List<Manutencao> listarPorMaterial(
+    @Operation(
+        summary = "Histórico de manutenção do patrimônio",
+        description = "Lista todas as manutenções registradas para um patrimônio específico."
+    )
+    @GetMapping("/patrimonio/{id}")
+    public List<Manutencao> listarPorPatrimonio(
             @PathVariable Long id) {
 
-        return service.listarPorMaterial(id);
+        return service.listarPorPatrimonio(id);
     }
 }

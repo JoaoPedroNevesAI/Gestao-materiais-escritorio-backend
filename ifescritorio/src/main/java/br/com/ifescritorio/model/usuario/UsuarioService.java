@@ -43,7 +43,7 @@ public class UsuarioService implements UserDetailsService {
         }
 
         if (usuario.getTipo() == null) {
-            usuario.setTipo(TipoUsuario.CLIENTE);
+            usuario.setTipo(TipoUsuario.COLABORADOR);
         }
 
         usuario.setSenha(

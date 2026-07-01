@@ -40,43 +40,40 @@ public class SecurityConfiguration {
             // =========================
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-            // =========================
-            // CSRF
-            // =========================
             .csrf(csrf -> csrf.disable())
 
-            // =========================
-            // AUTORIZAÇÃO
-            // =========================
             .authorizeHttpRequests(auth -> auth
 
                 // LIBERA OPTIONS
                 .requestMatchers(HttpMethod.OPTIONS, "/**")
                 .permitAll()
 
-                // =========================
                 // AUTH
                 // =========================
                 .requestMatchers("/api/auth/**")
                 .permitAll()
 
-                // =========================
                 // CADASTRO USUÁRIO
                 // =========================
                 .requestMatchers(HttpMethod.POST, "/api/usuario")
                 .permitAll()
 
-                // =========================
                 // SWAGGER
-                // =========================
                 .requestMatchers(
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**"
-                ).permitAll()
+                	    "/swagger-ui/**",
+                	    "/v3/api-docs/**",
+                	    "/api-docs/**",
+                	    "/api-docs")
+                .permitAll()
 
-                // =========================
+                // IMAGENS
+                .requestMatchers(
+                        "/imagens/**")
+                .permitAll()
+
+                // ==========================
                 // MATERIAL
-                // =========================
+                // ==========================
 
                 // FILTRAR — deve vir ANTES da regra geral de POST
                 .requestMatchers(HttpMethod.POST, "/api/material/filtrar")
@@ -98,9 +95,19 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.DELETE, "/api/material/**")
                 .hasRole("ADM")
 
-                // =========================
+                .requestMatchers(
+                        HttpMethod.PUT,
+                        "/api/patrimonio/**")
+                .hasRole("ADM")
+
+                .requestMatchers(
+                        HttpMethod.DELETE,
+                        "/api/patrimonio/**")
+                .hasRole("ADM")
+
+                // ==========================
                 // CATEGORIA
-                // =========================
+                // ==========================
 
                 // LISTAR
                 .requestMatchers(HttpMethod.GET, "/api/categoria/**")
@@ -118,16 +125,11 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.DELETE, "/api/categoria/**")
                 .hasRole("ADM")
 
-                // =========================
                 // RESTANTE
-                // =========================
                 .anyRequest()
                 .authenticated()
             )
 
-            // =========================
-            // SESSION
-            // =========================
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
@@ -137,9 +139,6 @@ public class SecurityConfiguration {
             // =========================
             .authenticationProvider(authenticationProvider)
 
-            // =========================
-            // JWT FILTER
-            // =========================
             .addFilterBefore(
                 jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class
@@ -148,9 +147,6 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    // =========================
-    // CORS CONFIG
-    // =========================
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
@@ -173,7 +169,6 @@ public class SecurityConfiguration {
         // HEADERS
         configuration.setAllowedHeaders(Arrays.asList("*"));
 
-        // CREDENCIAIS
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

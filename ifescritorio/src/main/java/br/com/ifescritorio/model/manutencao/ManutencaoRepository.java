@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ManutencaoRepository
         extends JpaRepository<Manutencao, Long> {
 
-    List<Manutencao> findByMaterialIdOrderByDataSolicitacaoDesc(
-            Long materialId);
+	List<Manutencao> findByPatrimonioIdOrderByDataSolicitacaoDesc(
+	        Long patrimonioId);
 
     List<Manutencao> findByStatus(
             StatusManutencao status);

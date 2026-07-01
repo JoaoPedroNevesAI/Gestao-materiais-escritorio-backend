@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 import br.com.ifescritorio.model.local.Local;
 import br.com.ifescritorio.model.local.LocalRepository;
-import br.com.ifescritorio.model.material.Material;
-import br.com.ifescritorio.model.material.MaterialRepository;
+import br.com.ifescritorio.model.patrimonio.Patrimonio;
+import br.com.ifescritorio.model.patrimonio.PatrimonioRepository;
 import br.com.ifescritorio.model.usuario.Usuario;
 import br.com.ifescritorio.util.exception.EntidadeNaoEncontradaException;
 
@@ -20,25 +20,25 @@ public class MovimentacaoService {
     private MovimentacaoRepository repository;
 
     @Autowired
-    private MaterialRepository materialRepository;
+    private PatrimonioRepository patrimonioRepository;
 
     @Autowired
     private LocalRepository localRepository;
 
     public Movimentacao transferir(
-            Long materialId,
+            Long patrimonioId,
             Long localDestinoId,
             String observacao,
             Usuario usuario) {
 
-        Material material =
-                materialRepository.findById(materialId)
+        Patrimonio patrimonio =
+                patrimonioRepository.findById(patrimonioId)
                         .orElseThrow(() ->
                                 new EntidadeNaoEncontradaException(
-                                        "Material",
-                                        materialId));
+                                        "Patrimonio",
+                                        patrimonioId));
 
-        Local origem = material.getLocal();
+        Local origem = patrimonio.getLocal();
 
         Local destino =
                 localRepository.findById(localDestinoId)
@@ -49,7 +49,7 @@ public class MovimentacaoService {
 
         if (origem.getId().equals(destino.getId())) {
             throw new IllegalArgumentException(
-                    "O material já está neste local.");
+                    "O patrimônio já está neste local.");
         }
 
         material.setLocal(destino);
@@ -57,7 +57,7 @@ public class MovimentacaoService {
 
         Movimentacao movimentacao =
                 Movimentacao.builder()
-                        .material(material)
+                        .patrimonio(patrimonio)
                         .localOrigem(origem)
                         .localDestino(destino)
                         .observacao(observacao)
@@ -76,7 +76,7 @@ public class MovimentacaoService {
             Long materialId) {
 
         return repository
-                .findByMaterialIdOrderByDataMovimentacaoDesc(
-                        materialId);
+                .findByPatrimonioIdOrderByDataMovimentacaoDesc(
+                        patrimonioId);
     }
 }
