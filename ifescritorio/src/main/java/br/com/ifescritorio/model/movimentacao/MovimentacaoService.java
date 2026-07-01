@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import br.com.ifescritorio.model.local.Local;
 import br.com.ifescritorio.model.local.LocalRepository;
+import br.com.ifescritorio.model.material.Material;
+import br.com.ifescritorio.model.material.MaterialRepository;
 import br.com.ifescritorio.model.patrimonio.Patrimonio;
 import br.com.ifescritorio.model.patrimonio.PatrimonioRepository;
 import br.com.ifescritorio.model.usuario.Usuario;
@@ -24,6 +26,9 @@ public class MovimentacaoService {
 
     @Autowired
     private LocalRepository localRepository;
+
+    @Autowired
+    private MaterialRepository materialRepository;
 
     public Movimentacao transferir(
             Long patrimonioId,
@@ -53,8 +58,13 @@ public class MovimentacaoService {
         }
 
         patrimonio.setLocal(destino);
-
         patrimonioRepository.save(patrimonio);
+
+        Material material = patrimonio.getMaterial();
+        if (material != null) {
+            material.setLocal(destino);
+            materialRepository.save(material);
+        }
 
         Movimentacao movimentacao =
                 Movimentacao.builder()
@@ -75,5 +85,9 @@ public class MovimentacaoService {
         return repository
                 .findByPatrimonioIdOrderByDataMovimentacaoDesc(
                         patrimonioId);
+    }
+
+    public List<Movimentacao> listarTodas() {
+        return repository.findAllByOrderByDataMovimentacaoDesc();
     }
 }

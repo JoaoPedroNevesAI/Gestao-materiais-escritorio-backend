@@ -60,4 +60,8 @@ public class QrCodeUtil {
                     e);
         }
     }
+
+    public static void imprimirNoConsole(String conteudo) {
+        // Método limpo para evitar poluição no terminal do backend
+    }
 }

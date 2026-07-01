@@ -19,7 +19,6 @@ public class UsuarioRequest {
     @Email(message = "Email inválido")
     private String email;
 
-    @NotBlank(message = "Senha é obrigatória")
     private String senha;
 
     private TipoUsuario tipo;

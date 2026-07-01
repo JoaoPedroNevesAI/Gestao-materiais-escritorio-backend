@@ -9,4 +9,6 @@ public interface MovimentacaoRepository
 
     List<Movimentacao> findByPatrimonioIdOrderByDataMovimentacaoDesc(
     	    Long patrimonioId);
+
+    List<Movimentacao> findAllByOrderByDataMovimentacaoDesc();
 }

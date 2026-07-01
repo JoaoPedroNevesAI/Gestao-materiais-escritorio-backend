@@ -76,9 +76,10 @@ public class SecurityConfiguration {
                 	    "/api-docs")
                 .permitAll()
 
-                // IMAGENS
+                // IMAGENS E QRCODES
                 .requestMatchers(
-                        "/imagens/**")
+                        "/imagens/**",
+                        "/qrcodes/**")
                 .permitAll()
 
                 // ==========================
@@ -111,6 +112,7 @@ public class SecurityConfiguration {
 
                 .requestMatchers(
                         HttpMethod.GET,
+                        "/api/patrimonio",
                         "/api/patrimonio/**")
                 .hasAnyRole("ADM", "COLABORADOR")
 
@@ -159,6 +161,7 @@ public class SecurityConfiguration {
 
                 .requestMatchers(
                         HttpMethod.GET,
+                        "/api/movimentacao",
                         "/api/movimentacao/**")
                 .hasAnyRole("ADM", "COLABORADOR")
 

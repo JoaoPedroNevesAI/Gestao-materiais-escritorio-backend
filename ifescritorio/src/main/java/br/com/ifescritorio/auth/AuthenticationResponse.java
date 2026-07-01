@@ -10,4 +10,6 @@ public class AuthenticationResponse {
     private String token;
     private String nome;
     private String role;
+    private Long id;
+    private String email;
 }
