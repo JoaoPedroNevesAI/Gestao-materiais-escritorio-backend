@@ -53,7 +53,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/auth/**")
                 .permitAll()
 
-                // CADASTRO USUÁRIO
+                // CADASTRAR USUÁRIO
                 // =========================
                 .requestMatchers(HttpMethod.POST, "/api/usuario")
                 .permitAll()
