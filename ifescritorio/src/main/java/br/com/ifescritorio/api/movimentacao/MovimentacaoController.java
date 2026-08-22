@@ -37,35 +37,20 @@ public class MovimentacaoController {
     public Movimentacao transferir(
             @RequestBody MovimentacaoRequest request) {
 
-        String email =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getName();
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
 
-        Usuario usuario =
-                usuarioRepository
-                        .findByEmail(email)
-                        .orElse(null);
+        Usuario usuario = usuarioRepository
+                .findByEmail(email)
+                .orElse(null);
 
         return service.transferir(
                 request.getPatrimonioId(),
                 request.getLocalDestinoId(),
                 request.getObservacao(),
                 usuario);
-    }
-
-    
-    @GetMapping
-    public List<Movimentacao> listarTodas() {
-        return service.listarTodas();
-    }
-
-    @GetMapping("/material/{id}")
-    public List<Movimentacao> listarPorMaterial(
-            @PathVariable Long id) {
-
-        return service.listarPorPatrimonio(id);
     }
 
     @Operation(
@@ -75,5 +60,16 @@ public class MovimentacaoController {
     @GetMapping
     public List<Movimentacao> listarTodas() {
         return service.listarTodas();
+    }
+
+    @Operation(
+        summary = "Listar movimentações de um patrimônio",
+        description = "Retorna o histórico de movimentações de um patrimônio específico."
+    )
+    @GetMapping("/patrimonio/{id}")
+    public List<Movimentacao> listarPorPatrimonio(
+            @PathVariable Long id) {
+
+        return service.listarPorPatrimonio(id);
     }
 }

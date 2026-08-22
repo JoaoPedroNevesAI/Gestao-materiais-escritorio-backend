@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 
 import br.com.ifescritorio.model.local.Local;
 import br.com.ifescritorio.model.local.LocalRepository;
-import br.com.ifescritorio.model.material.Material;
-import br.com.ifescritorio.model.material.MaterialRepository;
 import br.com.ifescritorio.model.patrimonio.Patrimonio;
 import br.com.ifescritorio.model.patrimonio.PatrimonioRepository;
 import br.com.ifescritorio.model.usuario.Usuario;
@@ -27,54 +25,45 @@ public class MovimentacaoService {
     @Autowired
     private LocalRepository localRepository;
 
-    @Autowired
-    private MaterialRepository materialRepository;
-
     public Movimentacao transferir(
             Long patrimonioId,
             Long localDestinoId,
             String observacao,
             Usuario usuario) {
 
-        Patrimonio patrimonio =
-                patrimonioRepository.findById(patrimonioId)
-                        .orElseThrow(() ->
-                                new EntidadeNaoEncontradaException(
-                                        "Patrimonio",
-                                        patrimonioId));
+        Patrimonio patrimonio = patrimonioRepository
+                .findById(patrimonioId)
+                .orElseThrow(() ->
+                        new EntidadeNaoEncontradaException(
+                                "Patrimonio",
+                                patrimonioId));
 
         Local origem = patrimonio.getLocal();
 
-        Local destino =
-                localRepository.findById(localDestinoId)
-                        .orElseThrow(() ->
-                                new EntidadeNaoEncontradaException(
-                                        "Local",
-                                        localDestinoId));
+        Local destino = localRepository
+                .findById(localDestinoId)
+                .orElseThrow(() ->
+                        new EntidadeNaoEncontradaException(
+                                "Local",
+                                localDestinoId));
 
-        if (origem.getId().equals(destino.getId())) {
+        if (origem != null && origem.getId().equals(destino.getId())) {
             throw new IllegalArgumentException(
                     "O patrimônio já está neste local.");
         }
 
         patrimonio.setLocal(destino);
+
         patrimonioRepository.save(patrimonio);
 
-        Material material = patrimonio.getMaterial();
-        if (material != null) {
-            material.setLocal(destino);
-            materialRepository.save(material);
-        }
-
-        Movimentacao movimentacao =
-                Movimentacao.builder()
-                        .patrimonio(patrimonio)
-                        .localOrigem(origem)
-                        .localDestino(destino)
-                        .observacao(observacao)
-                        .usuario(usuario)
-                        .dataMovimentacao(LocalDateTime.now())
-                        .build();
+        Movimentacao movimentacao = Movimentacao.builder()
+                .patrimonio(patrimonio)
+                .localOrigem(origem)
+                .localDestino(destino)
+                .observacao(observacao)
+                .usuario(usuario)
+                .dataMovimentacao(LocalDateTime.now())
+                .build();
 
         return repository.save(movimentacao);
     }
@@ -83,15 +72,9 @@ public class MovimentacaoService {
         return repository.findAllByOrderByDataMovimentacaoDesc();
     }
 
-    public List<Movimentacao> listarPorMaterial(
-            Long materialId) {
-
+    public List<Movimentacao> listarPorPatrimonio(Long patrimonioId) {
         return repository
                 .findByPatrimonioIdOrderByDataMovimentacaoDesc(
                         patrimonioId);
-    }
-
-    public List<Movimentacao> listarTodas() {
-        return repository.findAllByOrderByDataMovimentacaoDesc();
     }
 }
