@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import br.com.ifescritorio.model.usuario.Usuario;
 import br.com.ifescritorio.model.usuario.UsuarioService;
+import br.com.ifescritorio.util.exception.RegraNegocioException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +34,10 @@ public class UsuarioController {
     @PostMapping
     public ResponseEntity<Usuario> save(
             @RequestBody @Valid UsuarioRequest request) {
+
+        if (request.getSenha() == null || request.getSenha().isBlank()) {
+            throw new RegraNegocioException("Senha é obrigatória");
+        }
 
         Usuario usuario =
                 usuarioService.save(

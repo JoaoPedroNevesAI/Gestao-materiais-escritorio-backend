@@ -21,10 +21,13 @@ public class Patrimonio extends EntidadeAuditavel {
 
     @ManyToOne
     @JoinColumn(name = "material_id", nullable = false)
+    @org.hibernate.annotations.NotFound(action = org.hibernate.annotations.NotFoundAction.IGNORE)
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("patrimonios")
     private Material material;
 
     @ManyToOne
     @JoinColumn(name = "local_id")
+    @org.hibernate.annotations.NotFound(action = org.hibernate.annotations.NotFoundAction.IGNORE)
     private Local local;
 
     @Enumerated(EnumType.STRING)

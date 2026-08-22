@@ -47,7 +47,6 @@ public class Material extends EntidadeAuditavel {
     @Column(name = "imagem")
     private String imagem;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "material")
     private List<Patrimonio> patrimonios;
 }

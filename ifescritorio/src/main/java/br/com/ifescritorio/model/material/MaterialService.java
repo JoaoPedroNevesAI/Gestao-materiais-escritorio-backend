@@ -258,6 +258,9 @@ public class MaterialService {
 
             patrimonioRepository.save(
                     patrimonio);
+
+            // Imprime no console para facilitar a apresentação
+            QrCodeUtil.imprimirNoConsole(codigo);
         }
     }
 }

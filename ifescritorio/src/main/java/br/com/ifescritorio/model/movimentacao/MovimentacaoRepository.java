@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface MovimentacaoRepository
         extends JpaRepository<Movimentacao, Long> {
 
-        List<Movimentacao> findByMaterialIdOrderByDataMovimentacaoDesc(Long materialId);
-        List<Movimentacao> findAllByOrderByDataMovimentacaoDesc();
+    List<Movimentacao> findByPatrimonioIdOrderByDataMovimentacaoDesc(
+    	    Long patrimonioId);
+
+    List<Movimentacao> findAllByOrderByDataMovimentacaoDesc();
 }

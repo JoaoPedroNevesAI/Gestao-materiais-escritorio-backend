@@ -49,6 +49,8 @@ public class AuthenticationController {
                 .token(token)
                 .nome(usuario.getNome())
                 .role("ROLE_" + usuario.getTipo().name())
+                .id(usuario.getId())
+                .email(usuario.getEmail())
                 .build()
         );
     }

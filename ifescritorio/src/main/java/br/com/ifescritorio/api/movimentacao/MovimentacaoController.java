@@ -67,4 +67,13 @@ public class MovimentacaoController {
 
         return service.listarPorPatrimonio(id);
     }
+
+    @Operation(
+        summary = "Listar todas as movimentações",
+        description = "Lista todas as movimentações de patrimônio registradas no sistema."
+    )
+    @GetMapping
+    public List<Movimentacao> listarTodas() {
+        return service.listarTodas();
+    }
 }

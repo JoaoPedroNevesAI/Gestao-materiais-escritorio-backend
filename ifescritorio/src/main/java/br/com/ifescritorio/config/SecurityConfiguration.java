@@ -66,9 +66,10 @@ public class SecurityConfiguration {
                 	    "/api-docs")
                 .permitAll()
 
-                // IMAGENS
+                // IMAGENS E QRCODES
                 .requestMatchers(
-                        "/imagens/**")
+                        "/imagens/**",
+                        "/qrcodes/**")
                 .permitAll()
 
                 // ==========================
@@ -91,8 +92,19 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.PUT, "/api/material/**")
                 .hasRole("ADM")
 
-                // DELETAR
-                .requestMatchers(HttpMethod.DELETE, "/api/material/**")
+                // ==========================
+                // PATRIMÔNIO
+                // ==========================
+
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/patrimonio",
+                        "/api/patrimonio/**")
+                .hasAnyRole("ADM", "COLABORADOR")
+
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/patrimonio/**")
                 .hasRole("ADM")
 
                 .requestMatchers(
@@ -121,8 +133,62 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.PUT, "/api/categoria/**")
                 .hasRole("ADM")
 
-                // DELETAR
-                .requestMatchers(HttpMethod.DELETE, "/api/categoria/**")
+                .requestMatchers(
+                        HttpMethod.DELETE,
+                        "/api/categoria/**")
+                .hasRole("ADM")
+
+                // ==========================
+                // MOVIMENTAÇÃO
+                // ==========================
+
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/movimentacao",
+                        "/api/movimentacao/**")
+                .hasAnyRole("ADM", "COLABORADOR")
+
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/movimentacao/**")
+                .hasRole("ADM")
+
+                // ==========================
+                // SOLICITAÇÃO MOVIMENTAÇÃO
+                // ==========================
+
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/solicitacao-movimentacao/solicitar")
+                .hasAnyRole("ADM", "COLABORADOR")
+
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/solicitacao-movimentacao/**")
+                .hasRole("ADM")
+
+                .requestMatchers(
+                        HttpMethod.PUT,
+                        "/api/solicitacao-movimentacao/**")
+                .hasRole("ADM")
+
+                // ==========================
+                // MANUTENÇÃO
+                // ==========================
+
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/manutencao/solicitar")
+                .hasAnyRole("ADM", "COLABORADOR")
+
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/manutencao/**")
+                .hasAnyRole("ADM", "COLABORADOR")
+
+                .requestMatchers(
+                        HttpMethod.PUT,
+                        "/api/manutencao/**")
                 .hasRole("ADM")
 
                 // RESTANTE

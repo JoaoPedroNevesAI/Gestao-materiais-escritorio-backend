@@ -30,14 +30,17 @@ public class SolicitacaoMovimentacao extends EntidadeAuditavel {
 
 	@ManyToOne
 	@JoinColumn(name = "patrimonio_id", nullable = false)
+	@org.hibernate.annotations.NotFound(action = org.hibernate.annotations.NotFoundAction.IGNORE)
 	private Patrimonio patrimonio;
 
     @ManyToOne
     @JoinColumn(name = "local_origem_id", nullable = false)
+    @org.hibernate.annotations.NotFound(action = org.hibernate.annotations.NotFoundAction.IGNORE)
     private Local localOrigem;
 
     @ManyToOne
     @JoinColumn(name = "local_destino_id", nullable = false)
+    @org.hibernate.annotations.NotFound(action = org.hibernate.annotations.NotFoundAction.IGNORE)
     private Local localDestino;
 
     @ManyToOne
