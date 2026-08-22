@@ -79,8 +79,12 @@ public class MovimentacaoService {
         return repository.save(movimentacao);
     }
 
-    public List<Movimentacao> listarPorPatrimonio(
-            Long patrimonioId) {
+    public List<Movimentacao> listarTodas() {
+        return repository.findAllByOrderByDataMovimentacaoDesc();
+    }
+
+    public List<Movimentacao> listarPorMaterial(
+            Long materialId) {
 
         return repository
                 .findByPatrimonioIdOrderByDataMovimentacaoDesc(

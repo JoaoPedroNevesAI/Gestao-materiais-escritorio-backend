@@ -55,12 +55,14 @@ public class MovimentacaoController {
                 usuario);
     }
 
-    @Operation(
-        summary = "Histórico de movimentações",
-        description = "Lista todas as movimentações registradas para um patrimônio específico."
-    )
-    @GetMapping("/patrimonio/{id}")
-    public List<Movimentacao> listarPorPatrimonio(
+    
+    @GetMapping
+    public List<Movimentacao> listarTodas() {
+        return service.listarTodas();
+    }
+
+    @GetMapping("/material/{id}")
+    public List<Movimentacao> listarPorMaterial(
             @PathVariable Long id) {
 
         return service.listarPorPatrimonio(id);
