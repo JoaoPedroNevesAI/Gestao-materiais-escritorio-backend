@@ -92,30 +92,35 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.PUT, "/api/material/**")
                 .hasRole("ADM")
 
-                // ==========================
-                // PATRIMÔNIO
-                // ==========================
-
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/api/patrimonio",
-                        "/api/patrimonio/**")
-                .hasAnyRole("ADM", "COLABORADOR")
-
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/api/patrimonio/**")
-                .hasRole("ADM")
-
-                .requestMatchers(
-                        HttpMethod.PUT,
-                        "/api/patrimonio/**")
-                .hasRole("ADM")
-
-                .requestMatchers(
-                        HttpMethod.DELETE,
-                        "/api/patrimonio/**")
-                .hasRole("ADM")
+	             // ==========================
+	             // PATRIMÔNIO
+	             // ==========================
+	
+	             .requestMatchers(
+	                     HttpMethod.GET,
+	                     "/api/patrimonio",
+	                     "/api/patrimonio/**")
+	             .hasAnyRole("ADM", "COLABORADOR")
+	
+	             .requestMatchers(
+	                     HttpMethod.POST,
+	                     "/api/patrimonio/*/qrcode/regenerar")
+	             .hasRole("ADM")
+	
+	             .requestMatchers(
+	                     HttpMethod.POST,
+	                     "/api/patrimonio/**")
+	             .hasRole("ADM")
+	
+	             .requestMatchers(
+	                     HttpMethod.PUT,
+	                     "/api/patrimonio/**")
+	             .hasRole("ADM")
+	
+	             .requestMatchers(
+	                     HttpMethod.DELETE,
+	                     "/api/patrimonio/**")
+	             .hasRole("ADM")
 
                 // ==========================
                 // CATEGORIA

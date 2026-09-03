@@ -30,7 +30,6 @@ public class PatrimonioRequest {
                 .material(material)
                 .local(local)
                 .status(StatusPatrimonio.DISPONIVEL)
-                .qrCode(codigoPatrimonio)
                 .observacao(observacao)
                 .build();
     }

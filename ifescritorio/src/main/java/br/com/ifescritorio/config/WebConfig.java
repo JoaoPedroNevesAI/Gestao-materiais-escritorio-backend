@@ -1,28 +1,34 @@
 package br.com.ifescritorio.config;
 
-
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import br.com.ifescritorio.util.Util;
 
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
-
+public class WebConfig
+        implements WebMvcConfigurer {
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(
+            ResourceHandlerRegistry registry) {
 
+        registry.addResourceHandler(
+                "/imagens/**"
+        )
+        .addResourceLocations(
+                "file:"
+                + Util.LOCAL_ARMAZENAMENTO_IMAGENS
+        );
 
-        // Toda requisição para /imagens/nome_da_foto.jpg será
-        // redirecionada
-        // para a pasta C:/ifes-patrimonio/uploads/
-
-
-        registry.addResourceHandler("/imagens/**")
-                .addResourceLocations("file:C:/ifes-patrimonio/uploads/");
-        
-        registry.addResourceHandler("/qrcodes/**")
-        .addResourceLocations("file:C:/ifes-patrimonio/uploads/qrcodes/");
+        registry.addResourceHandler(
+                "/qrcodes/**"
+        )
+        .addResourceLocations(
+                "file:"
+                + Util.LOCAL_ARMAZENAMENTO_IMAGENS
+                + "qrcodes/"
+        );
     }
 }

@@ -55,28 +55,41 @@ public class PatrimonioController {
 
         service.deletar(id);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+                .noContent()
+                .build();
     }
-    
+
     @Operation(
-    	    summary = "Buscar patrimônio por código",
-    	    description = "Retorna um patrimônio através do código patrimonial."
-    	)
-    	@GetMapping("/codigo/{codigo}")
-    	public Patrimonio obterPorCodigo(
-    	        @PathVariable String codigo) {
+        summary = "Buscar patrimônio por código",
+        description = "Retorna um patrimônio através do código patrimonial."
+    )
+    @GetMapping("/codigo/{codigo}")
+    public Patrimonio obterPorCodigo(
+            @PathVariable String codigo) {
 
-    	    return service.obterPorCodigo(codigo);
-    	}
+        return service.obterPorCodigo(codigo);
+    }
 
-    	@Operation(
-    	    summary = "Buscar patrimônio por QR Code",
-    	    description = "Retorna um patrimônio através do valor armazenado no QR Code."
-    	)
-    	@GetMapping("/qrcode/{qrcode}")
-    	public Patrimonio obterPorQrCode(
-    	        @PathVariable String qrcode) {
+    @Operation(
+        summary = "Buscar patrimônio por QR Code",
+        description = "Retorna um patrimônio através do identificador armazenado no QR Code."
+    )
+    @GetMapping("/qrcode/{qrcode}")
+    public Patrimonio obterPorQrCode(
+            @PathVariable String qrcode) {
 
-    	    return service.obterPorQrCode(qrcode);
-    	}
+        return service.obterPorQrCode(qrcode);
+    }
+
+    @Operation(
+        summary = "Regenerar QR Code",
+        description = "Regenera o arquivo físico do QR Code de um patrimônio."
+    )
+    @PostMapping("/{id}/qrcode/regenerar")
+    public Patrimonio regenerarQrCode(
+            @PathVariable Long id) {
+
+        return service.regenerarQrCode(id);
+    }
 }

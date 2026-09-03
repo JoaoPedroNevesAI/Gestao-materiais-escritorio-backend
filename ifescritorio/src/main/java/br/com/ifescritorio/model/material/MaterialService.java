@@ -223,6 +223,10 @@ public class MaterialService {
         return listaMateriais;
     }
 
+    /**
+     * Gera automaticamente um patrimônio
+     * para cada unidade do material.
+     */
     private void gerarPatrimonios(
             Material material) {
 
@@ -236,10 +240,20 @@ public class MaterialService {
                             .observacao("Gerado automaticamente")
                             .build();
 
+            /*
+             * Primeiro salva para obter o ID
+             * que será utilizado no código patrimonial.
+             */
             patrimonio =
                     patrimonioRepository.save(
                             patrimonio);
 
+            /*
+             * Gera o código único do patrimônio.
+             *
+             * Exemplo:
+             * PAT-000001
+             */
             String codigo =
                     String.format(
                             "PAT-%06d",
@@ -248,19 +262,28 @@ public class MaterialService {
             patrimonio.setCodigoPatrimonio(
                     codigo);
 
-            String qrCodeImagem =
-                    QrCodeUtil.gerarQRCode(
-                            codigo,
-                            codigo);
-
+            /*
+             * O QR Code utiliza o próprio
+             * código patrimonial como conteúdo.
+             */
             patrimonio.setQrCode(
-                    qrCodeImagem);
+                    codigo);
 
+            /*
+             * Gera o arquivo PNG:
+             *
+             * uploads/qrcodes/PAT-000001.png
+             */
+            QrCodeUtil.gerarQRCode(
+                    codigo,
+                    codigo);
+
+            /*
+             * Atualiza o patrimônio com
+             * código e QR Code.
+             */
             patrimonioRepository.save(
                     patrimonio);
-
-            // Imprime no console para facilitar a apresentação
-            QrCodeUtil.imprimirNoConsole(codigo);
         }
     }
 }

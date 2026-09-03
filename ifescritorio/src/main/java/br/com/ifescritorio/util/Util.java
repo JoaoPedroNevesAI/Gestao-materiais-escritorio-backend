@@ -9,12 +9,28 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class Util {
 
+    /**
+     * Diretório utilizado para armazenamento de arquivos.
+     *
+     * Em desenvolvimento, utiliza:
+     * C:/ifes-patrimonio/uploads/
+     *
+     * Em produção/Docker, pode ser definido através
+     * da variável de ambiente:
+     *
+     * PATRIMONIO_UPLOAD_DIR
+     */
     public static final String LOCAL_ARMAZENAMENTO_IMAGENS =
-            "C:/ifes-patrimonio/uploads/";
+            System.getenv().getOrDefault(
+                    "PATRIMONIO_UPLOAD_DIR",
+                    "C:/ifes-patrimonio/uploads/"
+            );
 
-    public static String fazerUploadImagem(MultipartFile imagem) {
+    public static String fazerUploadImagem(
+            MultipartFile imagem) {
 
         boolean sucessoUpload = false;
+
         String nomeArquivoComDataHora = null;
 
         if (imagem != null && !imagem.isEmpty()) {
@@ -35,30 +51,49 @@ public class Util {
 
             try {
 
-                File dir = new File(
-                        LOCAL_ARMAZENAMENTO_IMAGENS);
+                File dir =
+                        new File(
+                                LOCAL_ARMAZENAMENTO_IMAGENS
+                        );
 
                 if (!dir.exists()) {
-                    dir.mkdirs();
+
+                    if (!dir.mkdirs()) {
+
+                        throw new RuntimeException(
+                                "Não foi possível criar o diretório de uploads."
+                        );
+                    }
                 }
 
                 File serverFile =
-                        new File(dir.getAbsolutePath()
+                        new File(
+                                dir.getAbsolutePath()
                                 + File.separator
-                                + nomeArquivoComDataHora);
+                                + nomeArquivoComDataHora
+                        );
 
-                System.out.println(serverFile.getAbsolutePath());
+                System.out.println(
+                        "Arquivo salvo em: "
+                        + serverFile.getAbsolutePath()
+                );
 
-                BufferedOutputStream stream =
-                        new BufferedOutputStream(
-                                new FileOutputStream(serverFile));
+                try (
+                        BufferedOutputStream stream =
+                                new BufferedOutputStream(
+                                        new FileOutputStream(serverFile)
+                                )
+                ) {
 
-                stream.write(imagem.getBytes());
-                stream.close();
+                    stream.write(
+                            imagem.getBytes()
+                    );
+                }
 
                 sucessoUpload = true;
 
             } catch (Exception e) {
+
                 e.printStackTrace();
             }
         }
