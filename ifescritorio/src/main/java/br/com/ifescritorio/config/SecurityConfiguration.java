@@ -195,6 +195,26 @@ public class SecurityConfiguration {
                         HttpMethod.PUT,
                         "/api/manutencao/**")
                 .hasRole("ADM")
+                
+                // ==========================
+                // NOTIFICAÇÃO
+                // ==========================
+                
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/notificacao",
+                        "/api/notificacao/**")
+                .hasAnyRole("ADM", "COLABORADOR")
+
+                .requestMatchers(
+                        HttpMethod.PUT,
+                        "/api/notificacao/**")
+                .hasAnyRole("ADM", "COLABORADOR")
+
+                .requestMatchers(
+                        HttpMethod.DELETE,
+                        "/api/notificacao/**")
+                .hasAnyRole("ADM", "COLABORADOR")
 
                 // RESTANTE
                 .anyRequest()

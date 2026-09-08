@@ -3,13 +3,12 @@ package br.com.ifescritorio.api.movimentacao;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import br.com.ifescritorio.model.movimentacao.Movimentacao;
 import br.com.ifescritorio.model.movimentacao.MovimentacaoService;
 import br.com.ifescritorio.model.usuario.Usuario;
-import br.com.ifescritorio.model.usuario.UsuarioRepository;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,57 +18,103 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @CrossOrigin
 @Tag(
     name = "API Movimentação",
-    description = "API responsável pelas transferências e histórico de movimentações dos patrimônios"
+    description = "API responsável pelas solicitações, aprovações e histórico de movimentações dos patrimônios"
 )
 public class MovimentacaoController {
 
     @Autowired
     private MovimentacaoService service;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
     @Operation(
-        summary = "Transferir patrimônio",
-        description = "Realiza a transferência de um patrimônio para outro local e registra a movimentação."
+        summary = "Solicitar movimentação",
+        description = "Cria uma solicitação de transferência de um patrimônio para outro local."
     )
-    @PostMapping("/transferir")
-    public Movimentacao transferir(
-            @RequestBody MovimentacaoRequest request) {
+    @PostMapping
+    public Movimentacao solicitar(
+            @RequestBody MovimentacaoRequest request,
+            @AuthenticationPrincipal Usuario usuario) {
 
-        String email = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
-
-        Usuario usuario = usuarioRepository
-                .findByEmail(email)
-                .orElse(null);
-
-        return service.transferir(
+        return service.solicitar(
                 request.getPatrimonioId(),
                 request.getLocalDestinoId(),
                 request.getObservacao(),
-                usuario);
+                usuario
+        );
     }
 
     @Operation(
         summary = "Listar todas as movimentações",
-        description = "Lista todas as movimentações de patrimônio registradas no sistema."
+        description = "Lista todas as movimentações e solicitações registradas no sistema."
     )
     @GetMapping
     public List<Movimentacao> listarTodas() {
+
         return service.listarTodas();
     }
 
     @Operation(
-        summary = "Listar movimentações de um patrimônio",
-        description = "Retorna o histórico de movimentações de um patrimônio específico."
+        summary = "Listar movimentações pendentes",
+        description = "Retorna as movimentações que aguardam aprovação administrativa."
+    )
+    @GetMapping("/pendentes")
+    public List<Movimentacao> listarPendentes() {
+
+        return service.listarPendentes();
+    }
+
+    @Operation(
+        summary = "Listar histórico por patrimônio",
+        description = "Retorna o histórico de movimentações de um patrimônio."
     )
     @GetMapping("/patrimonio/{id}")
     public List<Movimentacao> listarPorPatrimonio(
             @PathVariable Long id) {
 
         return service.listarPorPatrimonio(id);
+    }
+
+    @Operation(
+        summary = "Buscar movimentação por ID",
+        description = "Retorna uma movimentação específica."
+    )
+    @GetMapping("/{id}")
+    public Movimentacao obterPorId(
+            @PathVariable Long id) {
+
+        return service.obterPorId(id);
+    }
+
+    @Operation(
+        summary = "Aprovar movimentação",
+        description = "Aprova a solicitação e realiza a transferência do patrimônio."
+    )
+    @PutMapping("/{id}/aprovar")
+    public Movimentacao aprovar(
+            @PathVariable Long id,
+            @RequestBody AprovarMovimentacaoRequest request,
+            @AuthenticationPrincipal Usuario admin) {
+
+        return service.aprovar(
+                id,
+                request.getObservacaoAdmin(),
+                admin
+        );
+    }
+
+    @Operation(
+        summary = "Reprovar movimentação",
+        description = "Reprova uma solicitação de movimentação."
+    )
+    @PutMapping("/{id}/reprovar")
+    public Movimentacao reprovar(
+            @PathVariable Long id,
+            @RequestBody AprovarMovimentacaoRequest request,
+            @AuthenticationPrincipal Usuario admin) {
+
+        return service.reprovar(
+                id,
+                request.getObservacaoAdmin(),
+                admin
+        );
     }
 }
