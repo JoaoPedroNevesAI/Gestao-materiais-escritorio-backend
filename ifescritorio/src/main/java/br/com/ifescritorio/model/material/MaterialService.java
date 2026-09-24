@@ -227,28 +227,37 @@ public class MaterialService {
      * Gera automaticamente um patrimônio
      * para cada unidade do material.
      */
-	    private void gerarPatrimonios(Material material) {
-	
-	        for (int i = 0; i < material.getQuantidade(); i++) {
-	
-	            Long numero = patrimonioRepository.proximoNumeroCodigo();
-	
-	            String codigo =
-	                    String.format("PAT-%06d", numero);
-	
-	            Patrimonio patrimonio =
-	                    Patrimonio.builder()
-	                            .codigoPatrimonio(codigo)
-	                            .qrCode(codigo)
-	                            .material(material)
-	                            .local(material.getLocal())
-	                            .status(StatusPatrimonio.DISPONIVEL)
-	                            .observacao("Gerado automaticamente")
-	                            .build();
-	
-	            patrimonioRepository.save(patrimonio);
-	
-	            QrCodeUtil.gerarQRCode(codigo, codigo);
-	        }
-	    }
+    private void gerarPatrimonios(Material material) {
+
+        for (int i = 0; i < material.getQuantidade(); i++) {
+
+            String codigo = gerarProximoCodigoPatrimonio();
+
+            Patrimonio patrimonio =
+                    Patrimonio.builder()
+                            .codigoPatrimonio(codigo)
+                            .qrCode(codigo)
+                            .material(material)
+                            .local(material.getLocal())
+                            .status(StatusPatrimonio.DISPONIVEL)
+                            .observacao("Gerado automaticamente")
+                            .build();
+
+            patrimonioRepository.save(patrimonio);
+
+            QrCodeUtil.gerarQRCode(codigo, codigo);
+        }
+    }
+    
+    private String gerarProximoCodigoPatrimonio() {
+
+        long numero = 1;
+
+        while (patrimonioRepository.existsByCodigoPatrimonio(
+                String.format("PAT-%06d", numero))) {
+            numero++;
+        }
+
+        return String.format("PAT-%06d", numero);
+    }
 }
