@@ -78,11 +78,11 @@ public class SecurityConfiguration {
 
                 // FILTRAR — deve vir ANTES da regra geral de POST
                 .requestMatchers(HttpMethod.POST, "/api/material/filtrar")
-                .hasAnyRole("ADM", "CLIENTE")
+                .hasAnyRole("ADM", "COLABORADOR")
 
                 // LISTAR
                 .requestMatchers(HttpMethod.GET, "/api/material/**")
-                .hasAnyRole("ADM", "CLIENTE")
+                .hasAnyRole("ADM", "COLABORADOR")
 
                 // CRIAR
                 .requestMatchers(HttpMethod.POST, "/api/material/**")
@@ -128,7 +128,7 @@ public class SecurityConfiguration {
 
                 // LISTAR
                 .requestMatchers(HttpMethod.GET, "/api/categoria/**")
-                .hasAnyRole("ADM", "CLIENTE")
+                .hasAnyRole("ADM", "COLABORADOR")
 
                 // CRIAR
                 .requestMatchers(HttpMethod.POST, "/api/categoria/**")

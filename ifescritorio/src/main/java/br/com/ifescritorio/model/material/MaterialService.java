@@ -227,63 +227,28 @@ public class MaterialService {
      * Gera automaticamente um patrimônio
      * para cada unidade do material.
      */
-    private void gerarPatrimonios(
-            Material material) {
-
-        for (int i = 0; i < material.getQuantidade(); i++) {
-
-            Patrimonio patrimonio =
-                    Patrimonio.builder()
-                            .material(material)
-                            .local(material.getLocal())
-                            .status(StatusPatrimonio.DISPONIVEL)
-                            .observacao("Gerado automaticamente")
-                            .build();
-
-            /*
-             * Primeiro salva para obter o ID
-             * que será utilizado no código patrimonial.
-             */
-            patrimonio =
-                    patrimonioRepository.save(
-                            patrimonio);
-
-            /*
-             * Gera o código único do patrimônio.
-             *
-             * Exemplo:
-             * PAT-000001
-             */
-            String codigo =
-                    String.format(
-                            "PAT-%06d",
-                            patrimonio.getId());
-
-            patrimonio.setCodigoPatrimonio(
-                    codigo);
-
-            /*
-             * O QR Code utiliza o próprio
-             * código patrimonial como conteúdo.
-             */
-            patrimonio.setQrCode(
-                    codigo);
-
-            /*
-             * Gera o arquivo PNG:
-             *
-             * uploads/qrcodes/PAT-000001.png
-             */
-            QrCodeUtil.gerarQRCode(
-                    codigo,
-                    codigo);
-
-            /*
-             * Atualiza o patrimônio com
-             * código e QR Code.
-             */
-            patrimonioRepository.save(
-                    patrimonio);
-        }
-    }
+	    private void gerarPatrimonios(Material material) {
+	
+	        for (int i = 0; i < material.getQuantidade(); i++) {
+	
+	            Long numero = patrimonioRepository.proximoNumeroCodigo();
+	
+	            String codigo =
+	                    String.format("PAT-%06d", numero);
+	
+	            Patrimonio patrimonio =
+	                    Patrimonio.builder()
+	                            .codigoPatrimonio(codigo)
+	                            .qrCode(codigo)
+	                            .material(material)
+	                            .local(material.getLocal())
+	                            .status(StatusPatrimonio.DISPONIVEL)
+	                            .observacao("Gerado automaticamente")
+	                            .build();
+	
+	            patrimonioRepository.save(patrimonio);
+	
+	            QrCodeUtil.gerarQRCode(codigo, codigo);
+	        }
+	    }
 }
