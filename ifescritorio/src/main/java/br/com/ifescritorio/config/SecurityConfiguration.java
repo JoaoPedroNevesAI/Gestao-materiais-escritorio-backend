@@ -53,7 +53,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/auth/**")
                 .permitAll()
 
-                // CADASTRO USUÁRIO
+                // CADASTRAR USUÁRIO
                 // =========================
                 .requestMatchers(HttpMethod.POST, "/api/usuario")
                 .permitAll()
@@ -78,11 +78,11 @@ public class SecurityConfiguration {
 
                 // FILTRAR — deve vir ANTES da regra geral de POST
                 .requestMatchers(HttpMethod.POST, "/api/material/filtrar")
-                .hasAnyRole("ADM", "CLIENTE")
+                .hasAnyRole("ADM", "COLABORADOR")
 
                 // LISTAR
                 .requestMatchers(HttpMethod.GET, "/api/material/**")
-                .hasAnyRole("ADM", "CLIENTE")
+                .hasAnyRole("ADM", "COLABORADOR")
 
                 // CRIAR
                 .requestMatchers(HttpMethod.POST, "/api/material/**")
@@ -92,30 +92,35 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.PUT, "/api/material/**")
                 .hasRole("ADM")
 
-                // ==========================
-                // PATRIMÔNIO
-                // ==========================
-
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/api/patrimonio",
-                        "/api/patrimonio/**")
-                .hasAnyRole("ADM", "COLABORADOR")
-
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/api/patrimonio/**")
-                .hasRole("ADM")
-
-                .requestMatchers(
-                        HttpMethod.PUT,
-                        "/api/patrimonio/**")
-                .hasRole("ADM")
-
-                .requestMatchers(
-                        HttpMethod.DELETE,
-                        "/api/patrimonio/**")
-                .hasRole("ADM")
+	             // ==========================
+	             // PATRIMÔNIO
+	             // ==========================
+	
+	             .requestMatchers(
+	                     HttpMethod.GET,
+	                     "/api/patrimonio",
+	                     "/api/patrimonio/**")
+	             .hasAnyRole("ADM", "COLABORADOR")
+	
+	             .requestMatchers(
+	                     HttpMethod.POST,
+	                     "/api/patrimonio/*/qrcode/regenerar")
+	             .hasRole("ADM")
+	
+	             .requestMatchers(
+	                     HttpMethod.POST,
+	                     "/api/patrimonio/**")
+	             .hasRole("ADM")
+	
+	             .requestMatchers(
+	                     HttpMethod.PUT,
+	                     "/api/patrimonio/**")
+	             .hasRole("ADM")
+	
+	             .requestMatchers(
+	                     HttpMethod.DELETE,
+	                     "/api/patrimonio/**")
+	             .hasRole("ADM")
 
                 // ==========================
                 // CATEGORIA
@@ -123,7 +128,7 @@ public class SecurityConfiguration {
 
                 // LISTAR
                 .requestMatchers(HttpMethod.GET, "/api/categoria/**")
-                .hasAnyRole("ADM", "CLIENTE")
+                .hasAnyRole("ADM", "COLABORADOR")
 
                 // CRIAR
                 .requestMatchers(HttpMethod.POST, "/api/categoria/**")
@@ -190,6 +195,26 @@ public class SecurityConfiguration {
                         HttpMethod.PUT,
                         "/api/manutencao/**")
                 .hasRole("ADM")
+                
+                // ==========================
+                // NOTIFICAÇÃO
+                // ==========================
+                
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/notificacao",
+                        "/api/notificacao/**")
+                .hasAnyRole("ADM", "COLABORADOR")
+
+                .requestMatchers(
+                        HttpMethod.PUT,
+                        "/api/notificacao/**")
+                .hasAnyRole("ADM", "COLABORADOR")
+
+                .requestMatchers(
+                        HttpMethod.DELETE,
+                        "/api/notificacao/**")
+                .hasAnyRole("ADM", "COLABORADOR")
 
                 // RESTANTE
                 .anyRequest()
@@ -201,7 +226,7 @@ public class SecurityConfiguration {
             )
 
             // =========================
-            // PROVIDER
+            // PROVIDER  
             // =========================
             .authenticationProvider(authenticationProvider)
 

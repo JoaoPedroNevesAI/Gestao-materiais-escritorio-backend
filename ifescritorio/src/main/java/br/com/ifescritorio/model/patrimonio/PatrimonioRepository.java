@@ -12,4 +12,6 @@ public interface PatrimonioRepository
 
     Optional<Patrimonio> findByQrCode(
             String qrCode);
+    
+    boolean existsByCodigoPatrimonio(String codigoPatrimonio);
 }

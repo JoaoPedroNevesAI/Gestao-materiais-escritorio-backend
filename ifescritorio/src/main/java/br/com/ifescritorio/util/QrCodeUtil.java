@@ -1,6 +1,7 @@
 package br.com.ifescritorio.util;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -11,57 +12,118 @@ import com.google.zxing.qrcode.QRCodeWriter;
 
 public class QrCodeUtil {
 
+    /**
+     * Gera um QR Code em formato PNG.
+     *
+     * @param conteudo conteúdo que será armazenado no QR Code
+     * @param nomeArquivo nome do arquivo sem extensão
+     * @return nome do arquivo gerado
+     */
     public static String gerarQRCode(
             String conteudo,
             String nomeArquivo) {
 
         try {
 
-            // Pasta onde os QR Codes serão salvos
             String pasta =
-                    Util.LOCAL_ARMAZENAMENTO_IMAGENS + "qrcodes" + File.separator;
+                    Util.LOCAL_ARMAZENAMENTO_IMAGENS
+                    + "qrcodes"
+                    + File.separator;
 
-            // Cria a pasta caso ela não exista
-            File diretorio = new File(pasta);
+            File diretorio =
+                    new File(pasta);
 
-            if (!diretorio.exists()) {
-                diretorio.mkdirs();
+            if (!diretorio.exists()
+                    && !diretorio.mkdirs()) {
+
+                throw new RuntimeException(
+                        "Não foi possível criar a pasta dos QR Codes."
+                );
             }
 
-            // Caminho completo do arquivo
-            Path path = Paths.get(
-                    pasta,
-                    nomeArquivo + ".png");
+            Path path =
+                    Paths.get(
+                            pasta,
+                            nomeArquivo + ".png"
+                    );
 
-            // Geração do QR Code
-            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            QRCodeWriter qrCodeWriter =
+                    new QRCodeWriter();
 
             BitMatrix bitMatrix =
                     qrCodeWriter.encode(
                             conteudo,
                             BarcodeFormat.QR_CODE,
                             300,
-                            300);
+                            300
+                    );
 
             MatrixToImageWriter.writeToPath(
                     bitMatrix,
                     "PNG",
-                    path);
+                    path
+            );
 
-            // Retorna apenas o nome do arquivo salvo
             return nomeArquivo + ".png";
 
         } catch (Exception e) {
 
-            e.printStackTrace();
-
             throw new RuntimeException(
-                    "Erro ao gerar QR Code",
-                    e);
+                    "Erro ao gerar QR Code.",
+                    e
+            );
         }
     }
 
-    public static void imprimirNoConsole(String conteudo) {
-        // Método limpo para evitar poluição no terminal do backend
+    /**
+     * Remove o arquivo físico de um QR Code.
+     *
+     * @param nomeArquivo nome do arquivo sem extensão
+     */
+    public static void excluirQRCode(
+            String nomeArquivo) {
+
+        try {
+
+            String pasta =
+                    Util.LOCAL_ARMAZENAMENTO_IMAGENS
+                    + "qrcodes"
+                    + File.separator;
+
+            Path path =
+                    Paths.get(
+                            pasta,
+                            nomeArquivo + ".png"
+                    );
+
+            Files.deleteIfExists(path);
+
+        } catch (Exception e) {
+
+            throw new RuntimeException(
+                    "Erro ao excluir QR Code.",
+                    e
+            );
+        }
+    }
+
+    /**
+     * Verifica se o arquivo físico do QR Code existe.
+     */
+    public static boolean existeQRCode(
+            String nomeArquivo) {
+
+        String pasta =
+                Util.LOCAL_ARMAZENAMENTO_IMAGENS
+                + "qrcodes"
+                + File.separator;
+
+        Path path =
+                Paths.get(
+                        pasta,
+                        nomeArquivo + ".png"
+                );
+
+        return Files.exists(path);
     }
 }
