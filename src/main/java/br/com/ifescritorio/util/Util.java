@@ -9,22 +9,34 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class Util {
 
-    /**
-     * Diretório utilizado para armazenamento de arquivos.
-     *
-     * Em desenvolvimento, utiliza:
-     * C:/ifes-patrimonio/uploads/
-     *
-     * Em produção/Docker, pode ser definido através
-     * da variável de ambiente:
-     *
-     * PATRIMONIO_UPLOAD_DIR
-     */
-    public static final String LOCAL_ARMAZENAMENTO_IMAGENS =
-            System.getenv().getOrDefault(
-                    "PATRIMONIO_UPLOAD_DIR",
-                    "C:/ifes-patrimonio/uploads/"
-            );
+	/**
+	 * Diretório utilizado para armazenamento de arquivos.
+	 *
+	 * Em desenvolvimento, utiliza:
+	 * C:/ifes-patrimonio/uploads/
+	 *
+	 * Em produção/Docker, pode ser definido através
+	 * da variável de ambiente UPLOAD_DIR.
+	 */
+	public static final String LOCAL_ARMAZENAMENTO_IMAGENS =
+	        normalizarDiretorio(
+	                System.getenv().getOrDefault(
+	                        "UPLOAD_DIR",
+	                        "C:/ifes-patrimonio/uploads/"
+	                )
+	        );
+
+	private static String normalizarDiretorio(String diretorio) {
+	    if (diretorio == null || diretorio.isBlank()) {
+	        diretorio = "C:/ifes-patrimonio/uploads/";
+	    }
+
+	    if (!diretorio.endsWith("/") && !diretorio.endsWith("\\")) {
+	        diretorio += "/";
+	    }
+
+	    return diretorio;
+	}
 
     public static String fazerUploadImagem(
             MultipartFile imagem) {

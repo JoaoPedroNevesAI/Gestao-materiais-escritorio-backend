@@ -39,3 +39,12 @@ build/
 # Arquivos de sistema
 .DS_Store
 Thumbs.db
+
+# Dados locais do PostgreSQL
+/postgres-data/
+
+# Imagens e QR Codes enviados ou gerados
+/uploads/
+
+# Configurações locais
+/.env
