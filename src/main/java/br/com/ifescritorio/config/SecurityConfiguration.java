@@ -227,7 +227,7 @@ public class SecurityConfiguration {
             )
 
             // =========================
-            // PROVIDER  
+            // PROVIDERS  
             // =========================
             .authenticationProvider(authenticationProvider)
 
