@@ -1,3 +1,4 @@
+
 name: CI Backend
 
 on:
@@ -13,9 +14,26 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ifescritorio
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: ifescritorio_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d ifescritorio_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5433/ifescritorio_test
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
 
     steps:
       - name: Checkout do código
@@ -27,7 +45,7 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-          cache-dependency-path: ifescritorio/pom.xml
+          cache-dependency-path: pom.xml
 
       - name: Verificar Java
         run: java -version
