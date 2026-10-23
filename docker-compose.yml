@@ -32,7 +32,7 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: "${POSTGRES_PASSWORD:?Configure POSTGRES_PASSWORD no arquivo .env}"
       SECURITY_JWT_SECRETKEY: "${JWT_SECRET_KEY:?Configure JWT_SECRET_KEY no arquivo .env}"
-      SPRING_JPA_HIBERNATE_DDLAUTO: update
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       UPLOAD_DIR: /app/uploads/
     volumes:
       - uploads:/app/uploads
