@@ -1,0 +1,38 @@
+
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ifescritorio
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Configure POSTGRES_PASSWORD no arquivo .env}"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ifescritorio"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: ghcr.io/joaopedronevesai/gestao-materiais-escritorio-backend:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ifescritorio
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "${POSTGRES_PASSWORD:?Configure POSTGRES_PASSWORD no arquivo .env}"
+      SECURITY_JWT_SECRETKEY: "${JWT_SECRET_KEY:?Configure JWT_SECRET_KEY no arquivo .env}"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      UPLOAD_DIR: /app/uploads/
+    volumes:
+      - uploads:/app/uploads
+
+volumes:
+  postgres-data:
+  uploads:
