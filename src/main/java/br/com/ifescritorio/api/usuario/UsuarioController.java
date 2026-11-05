@@ -74,13 +74,25 @@ public class UsuarioController {
 
     @Operation(
         summary = "Buscar usuário por ID",
-        description = "Retorna um usuário específico através do seu identificador."
+        description = "Administradores podem consultar qualquer usuário. Colaboradores podem consultar somente o próprio cadastro."
     )
     @GetMapping("/{id}")
-    public Usuario obterPorID(
-            @PathVariable Long id) {
+    public ResponseEntity<Usuario> obterPorID(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Usuario usuarioAutenticado) {
 
-        return usuarioService.obterPorID(id);
+        if (usuarioAutenticado == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        boolean administrador =
+                usuarioAutenticado.getTipo() == TipoUsuario.ADM;
+
+        if (!administrador && !id.equals(usuarioAutenticado.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        return ResponseEntity.ok(usuarioService.obterPorID(id));
     }
 
     @Operation(
