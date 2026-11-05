@@ -1,8 +1,8 @@
 # Gestão de Materiais de Escritório — Backend
 
-Backend do sistema de Gestão de Materiais de Escritório, desenvolvido com Java e Spring Boot. A aplicação disponibiliza uma API REST para gerenciamento dos dados do sistema, utilizando PostgreSQL como banco de dados e JWT para autenticação.
+Backend do sistema de Gestão de Materiais de Escritório, desenvolvido com Java e Spring Boot. Disponibiliza uma API REST para gerenciamento dos dados do sistema, utilizando PostgreSQL como banco de dados e JWT para autenticação.
 
-## Tecnologias utilizadas
+## 1. Tecnologias utilizadas
 
 - Java 21
 - Spring Boot
@@ -15,18 +15,18 @@ Backend do sistema de Gestão de Materiais de Escritório, desenvolvido com Java
 - GitHub Actions para integração contínua
 - GitHub Container Registry (GHCR) para publicação da imagem Docker
 
-## Requisitos
+## 2. Requisitos
 
-Para executar o backend, é necessário ter:
+Para executar o backend utilizando Docker:
 
-- Git, para clonar o repositório.
+- Git instalado.
 - Docker Desktop instalado e em execução.
 - Docker Compose disponível por meio do Docker.
 - Acesso à internet para baixar as imagens necessárias.
 
-Para desenvolver e executar o projeto diretamente pelo Java, também é necessário ter o JDK 21 e o Maven (ou utilizar o Maven Wrapper, caso esteja disponível no projeto).
+Para desenvolver diretamente pelo Java, também é necessário ter o JDK 21 e o Maven ou o Maven Wrapper, caso disponível no projeto.
 
-## 1. Obtendo o projeto
+## 3. Obtendo o projeto
 
 Clone o repositório:
 
@@ -34,32 +34,31 @@ Clone o repositório:
 git clone <URL_DO_REPOSITORIO>
 ```
 
-Entre na pasta do projeto:
+Acesse a pasta:
 
 ```bash
 cd Gestao-materiais-escritorio-backend
 ```
 
-Abra a pasta no Visual Studio Code ou na IDE de sua preferência.
+Abra o projeto no Visual Studio Code ou em outra IDE de sua preferência.
 
-## 2. Configuração das variáveis de ambiente
+## 4. Configurando as variáveis de ambiente
 
-Antes de iniciar a aplicação, é necessário criar um arquivo `.env` na raiz do projeto.
+Antes de iniciar a aplicação, crie um arquivo chamado `.env` na raiz do projeto.
 
-Estrutura esperada:
+Estrutura:
 
 ```text
 Gestao-materiais-escritorio-backend/
 ├── src/
 ├── Dockerfile
 ├── docker-compose.yml
-├── compose.prod.yaml
 ├── pom.xml
 ├── .gitignore
 └── .env
 ```
 
-Conteúdo do arquivo `.env`:
+Conteúdo do `.env`:
 
 ```env
 POSTGRES_PASSWORD=sua_senha_do_banco
@@ -72,16 +71,16 @@ BACKEND_PORT=8080
 | Variável | Descrição |
 |---|---|
 | `POSTGRES_PASSWORD` | Senha utilizada pelo PostgreSQL. |
-| `JWT_SECRET_KEY` | Chave secreta utilizada pelo backend na autenticação JWT. |
-| `BACKEND_PORT` | Porta externa utilizada pelo backend na configuração de produção. |
+| `JWT_SECRET_KEY` | Chave secreta utilizada na autenticação JWT. |
+| `BACKEND_PORT` | Porta externa utilizada na configuração de produção. |
 
-Os valores apresentados são exemplos de configuração. Cada ambiente deve utilizar suas próprias credenciais e uma chave JWT segura e compatível com a configuração da aplicação.
+Cada ambiente deve utilizar suas próprias credenciais. A chave JWT deve ser segura e compatível com a configuração da aplicação.
 
-**Importante:** o arquivo `.env` contém informações privadas e não deve ser enviado ao GitHub. Verifique se ele está incluído no `.gitignore`.
+**Importante:** o `.env` é ignorado pelo `.gitignore` e não deve ser enviado ao GitHub. Nunca compartilhe senhas ou chaves secretas no repositório.
 
-## 3. Executando em ambiente de desenvolvimento
+## 5. Executando em ambiente de desenvolvimento
 
-O arquivo `docker-compose.yml` configura a execução do backend e do PostgreSQL utilizando o Dockerfile do próprio projeto.
+O arquivo `docker-compose.yml` utiliza o Dockerfile do projeto para construir e executar o backend junto ao PostgreSQL.
 
 Na raiz do repositório, execute:
 
@@ -94,24 +93,24 @@ Esse comando:
 1. Constrói a imagem Docker do backend a partir do código-fonte.
 2. Cria os containers necessários.
 3. Inicia o PostgreSQL.
-4. Aguarda o banco de dados ficar saudável.
+4. Aguarda o banco ficar saudável.
 5. Inicia o backend.
 
 ### Verificando os containers
-
-Para visualizar os containers em execução:
 
 ```bash
 docker compose ps
 ```
 
-Para consultar os logs do backend:
+### Consultando os logs
+
+Logs do backend:
 
 ```bash
 docker compose logs -f backend
 ```
 
-Para consultar os logs do banco de dados:
+Logs do PostgreSQL:
 
 ```bash
 docker compose logs -f db
@@ -119,19 +118,17 @@ docker compose logs -f db
 
 ### Endereços do ambiente de desenvolvimento
 
-Com a configuração padrão do `docker-compose.yml`:
-
 | Serviço | Endereço |
 |---|---|
 | Backend | `http://localhost:8080` |
 | Swagger UI | `http://localhost:8080/swagger-ui/index.html` |
 | PostgreSQL | `localhost:5433` |
 
-Dentro da rede Docker, o backend acessa o PostgreSQL pelo nome do serviço `db`, utilizando a porta interna do banco.
+Dentro da rede Docker, o backend se comunica com o PostgreSQL utilizando o nome do serviço `db` e a porta interna do banco.
 
-## 4. Executando com a imagem publicada no GHCR
+## 6. Executando com a imagem publicada no GHCR
 
-O projeto também possui uma imagem Docker publicada no GitHub Container Registry (GHCR).
+O projeto possui uma imagem Docker publicada no GitHub Container Registry (GHCR).
 
 Imagem:
 
@@ -141,9 +138,55 @@ ghcr.io/joaopedronevesai/gestao-materiais-escritorio-backend:latest
 
 Essa modalidade permite executar o backend em outra máquina sem precisar compilar o código-fonte ou instalar Java e Maven.
 
-O arquivo `compose.prod.yaml` utiliza essa imagem publicada, em vez de construir o backend localmente.
+### 6.1. Criando o arquivo de produção
 
-### 4.1. Baixando a imagem
+Atualmente, o arquivo `compose.prod.yaml` precisa ser criado manualmente na raiz do projeto, caso ainda não esteja disponível no repositório.
+
+Crie o arquivo `compose.prod.yaml` no VS Code e adicione:
+
+```yaml
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ifescritorio
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Configure POSTGRES_PASSWORD no arquivo .env}"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ifescritorio"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: ghcr.io/joaopedronevesai/gestao-materiais-escritorio-backend:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ifescritorio
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "${POSTGRES_PASSWORD:?Configure POSTGRES_PASSWORD no arquivo .env}"
+      SECURITY_JWT_SECRETKEY: "${JWT_SECRET_KEY:?Configure JWT_SECRET_KEY no arquivo .env}"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      UPLOAD_DIR: /app/uploads/
+    volumes:
+      - uploads:/app/uploads
+
+volumes:
+  postgres-data:
+  uploads:
+```
+
+Salve o arquivo na raiz do projeto, junto ao `docker-compose.yml`.
+
+### 6.2. Baixando a imagem publicada
 
 Com o Docker Desktop aberto, execute:
 
@@ -151,11 +194,11 @@ Com o Docker Desktop aberto, execute:
 docker pull ghcr.io/joaopedronevesai/gestao-materiais-escritorio-backend:latest
 ```
 
-O pacote está publicado no GitHub Container Registry como público, portanto o download da imagem não exige autenticação.
+A imagem está publicada como pacote público no GHCR, portanto o download não exige autenticação.
 
-### 4.2. Iniciando o ambiente
+### 6.3. Iniciando o ambiente
 
-Certifique-se de que o arquivo `compose.prod.yaml` e o `.env` estejam na raiz do projeto.
+Certifique-se de que os arquivos `compose.prod.yaml` e `.env` estejam na raiz do projeto.
 
 Execute:
 
@@ -167,7 +210,7 @@ O Docker Compose iniciará o PostgreSQL e o backend utilizando a imagem publicad
 
 Caso a imagem ainda não esteja disponível localmente, o Docker poderá baixá-la automaticamente.
 
-### 4.3. Verificando a execução
+### 6.4. Verificando a execução
 
 ```bash
 docker compose -f compose.prod.yaml ps
@@ -179,19 +222,19 @@ Para consultar os logs do backend:
 docker compose -f compose.prod.yaml logs -f backend
 ```
 
-O Swagger poderá ser acessado pelo endereço:
+O Swagger poderá ser acessado por:
 
 ```text
-http://localhost:<BACKEND_PORT>/swagger-ui/index.html
+http://localhost:8080/swagger-ui/index.html
 ```
 
-O valor de `BACKEND_PORT` é definido no `.env`. Caso não seja informado, a configuração utiliza a porta padrão definida no `compose.prod.yaml`.
+Caso a variável `BACKEND_PORT` tenha sido alterada, utilize a porta correspondente.
 
-**Observação:** o `compose.prod.yaml` prepara a execução da aplicação com a imagem publicada, mas não configura sozinho um domínio público ou HTTPS. Para disponibilizar o sistema na internet, ainda é necessário preparar a infraestrutura de hospedagem e segurança.
+**Observação:** essa configuração permite executar o backend com a imagem publicada, mas não configura automaticamente um domínio público ou HTTPS. Para disponibilizar a aplicação na internet, ainda é necessário preparar a infraestrutura de hospedagem e segurança.
 
-## 5. Utilizando a API
+## 7. Utilizando a API
 
-A aplicação disponibiliza uma interface Swagger para visualizar, consultar e testar os endpoints da API.
+A aplicação disponibiliza uma interface Swagger para visualizar, consultar e testar os endpoints.
 
 Acesse:
 
@@ -199,13 +242,13 @@ Acesse:
 http://localhost:8080/swagger-ui/index.html
 ```
 
-No ambiente executado com `compose.prod.yaml`, utilize a porta configurada para esse ambiente.
+No ambiente de produção, utilize a porta configurada.
 
 ### Fluxo inicial de utilização
 
 1. Acesse o Swagger UI.
 2. Localize a operação responsável pelo cadastro de usuários.
-3. Realize o cadastro de um usuário utilizando o modelo de dados apresentado pela documentação.
+3. Realize o cadastro utilizando o modelo de dados apresentado pela documentação.
 4. Localize a operação de login e informe as credenciais cadastradas.
 5. Obtenha o token JWT retornado pela autenticação.
 6. Utilize o recurso **Authorize** do Swagger para informar o token no formato solicitado pela API.
@@ -213,17 +256,15 @@ No ambiente executado com `compose.prod.yaml`, utilize a porta configurada para 
 
 O Swagger apresenta os endpoints, métodos HTTP, parâmetros, modelos de requisição e respostas disponíveis na versão atual da aplicação.
 
-As operações disponíveis devem ser consultadas diretamente na documentação da API, pois podem sofrer alterações durante a evolução do projeto.
+As operações devem ser consultadas diretamente na documentação da API, pois podem sofrer alterações durante a evolução do projeto.
 
-## 6. Persistência dos dados
+## 8. Persistência dos dados
 
 O Docker Compose utiliza volumes persistentes para armazenar os dados do PostgreSQL e os arquivos enviados pela aplicação.
 
-Volumes configurados:
-
 | Volume | Finalidade |
 |---|---|
-| `postgres-data` | Armazenamento persistente do banco PostgreSQL. |
+| `postgres-data` | Armazenamento persistente do PostgreSQL. |
 | `uploads` | Armazenamento persistente dos arquivos enviados pela aplicação. |
 
 Os dados permanecem armazenados mesmo quando os containers são reiniciados ou removidos sem a exclusão dos volumes.
@@ -242,36 +283,36 @@ docker compose down
 
 **Atenção:** não utilize `docker compose down -v` sem necessidade. A opção `-v` remove os volumes e pode apagar os dados persistidos do banco e os arquivos enviados.
 
-Cada instalação do Compose possui seus próprios volumes e seu próprio banco de dados. Os dados não são compartilhados automaticamente entre máquinas diferentes.
+Cada instalação do Compose possui seus próprios volumes e seu próprio banco. Os dados não são compartilhados automaticamente entre máquinas diferentes.
 
-## 7. Comandos úteis do Docker Compose
+## 9. Comandos úteis
 
 | Comando | Finalidade |
 |---|---|
 | `docker compose up --build -d` | Constrói e inicia o ambiente de desenvolvimento. |
-| `docker compose ps` | Lista os containers do ambiente. |
+| `docker compose ps` | Lista os containers em execução. |
 | `docker compose logs -f backend` | Acompanha os logs do backend. |
 | `docker compose logs -f db` | Acompanha os logs do PostgreSQL. |
 | `docker compose restart` | Reinicia os serviços. |
 | `docker compose down` | Para e remove os containers e a rede, preservando os volumes. |
 
-Para a configuração de produção, os mesmos comandos podem ser utilizados acrescentando:
+Para executar os mesmos comandos utilizando o arquivo de produção, acrescente:
 
 ```bash
 -f compose.prod.yaml
 ```
 
-Por exemplo:
+Exemplo:
 
 ```bash
 docker compose -f compose.prod.yaml ps
 ```
 
-## 8. Integração contínua e publicação da imagem
+## 10. Integração contínua e publicação da imagem
 
-O projeto utiliza GitHub Actions para automatizar a integração contínua.
+O projeto utiliza GitHub Actions para automatizar o processo de integração contínua.
 
-O workflow `CI Backend` realiza etapas como:
+O workflow `CI Backend` executa etapas como:
 
 - Configuração do ambiente Java.
 - Execução do build e dos testes com Maven.
@@ -279,27 +320,35 @@ O workflow `CI Backend` realiza etapas como:
 - Construção da imagem Docker.
 - Publicação da imagem no GitHub Container Registry, conforme as condições configuradas no workflow.
 
-A imagem publicada é identificada pelo seguinte endereço:
+A imagem publicada utiliza o endereço:
 
 ```text
 ghcr.io/joaopedronevesai/gestao-materiais-escritorio-backend
 ```
 
-São utilizadas as tags configuradas no workflow, incluindo `latest` e a identificação do commit.
+O workflow utiliza tags como `latest` e a identificação do commit.
 
-Isso permite que outras máquinas obtenham a imagem diretamente do GHCR, sem precisar reconstruir o backend.
+Para atualizar uma instalação que utiliza o arquivo de produção, execute:
 
-## 9. Segurança e recomendações
+```bash
+docker compose -f compose.prod.yaml pull
+docker compose -f compose.prod.yaml up -d
+```
+
+Isso permite obter uma versão mais recente da imagem publicada e recriar o container do backend conforme necessário.
+
+## 11. Segurança e recomendações
 
 - Nunca publique arquivos `.env` ou credenciais no repositório.
 - Utilize chaves JWT próprias e seguras em cada ambiente.
 - Não exponha diretamente o PostgreSQL à internet.
 - Utilize HTTPS ao disponibilizar a API publicamente.
-- Configure adequadamente as permissões de acesso e o CORS para os clientes autorizados.
+- Configure adequadamente o CORS para as origens autorizadas.
 - Mantenha backups dos volumes e dos dados importantes.
-- Antes de atualizar a aplicação, valide a nova imagem e a compatibilidade com o banco de dados.
+- Valide novas imagens antes de atualizar o ambiente.
+- Considere uma estratégia de migração de banco de dados antes de atualizar versões em produção.
 
-## 10. Solução de problemas
+## 12. Solução de problemas
 
 ### Docker não está em execução
 
@@ -307,7 +356,7 @@ Verifique se o Docker Desktop está aberto e se o mecanismo Docker está funcion
 
 ### Arquivo `.env` não encontrado ou variável ausente
 
-Verifique se o arquivo `.env` está na raiz do projeto e se contém as variáveis exigidas pelo Compose.
+Verifique se o arquivo `.env` está na raiz do projeto e se contém todas as variáveis exigidas pelo Compose.
 
 ### Backend não inicia
 
@@ -317,7 +366,7 @@ Consulte os logs:
 docker compose logs backend
 ```
 
-Verifique também se o PostgreSQL está saudável:
+Verifique também o estado dos containers:
 
 ```bash
 docker compose ps
@@ -329,14 +378,14 @@ Confira as credenciais do `.env`, a URL de conexão utilizada pelo backend e o e
 
 ### Swagger não abre
 
-Verifique se o container do backend está em execução, se a aplicação terminou de inicializar e se o endereço utilizado corresponde à porta configurada.
+Verifique se o backend está em execução, se a aplicação terminou de inicializar e se o endereço utilizado corresponde à porta configurada.
 
 ---
 
-## Observação sobre o ambiente de produção
+## Observação sobre implantação
 
-A configuração com imagem publicada no GHCR permite executar o backend em uma máquina diferente daquela utilizada no desenvolvimento.
+A configuração com imagem publicada no GHCR permite executar o backend em outra máquina.
 
-Para uma implantação pública definitiva, ainda devem ser configurados e verificados o servidor de hospedagem, HTTPS, firewall, backups, gerenciamento de segredos e estratégia de atualização do banco de dados.
+Para uma implantação pública definitiva, ainda é necessário configurar e verificar o servidor de hospedagem, HTTPS, firewall, backups, gerenciamento de segredos e estratégia de atualização do banco de dados.
 
 A execução local da imagem Docker não deve ser confundida com a disponibilização pública do sistema.
