@@ -35,36 +35,38 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // =========================
-            // CORS
-            // =========================
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
             .csrf(csrf -> csrf.disable())
-
             .authorizeHttpRequests(auth -> auth
 
-                // LIBERA OPTIONS
                 .requestMatchers(HttpMethod.OPTIONS, "/**")
                 .permitAll()
 
-                // AUTH
-                // =========================
+                // AUTENTICACAO
                 .requestMatchers("/api/auth/**")
                 .permitAll()
 
-                // CADASTRAR USUÁRIO
-                // =========================
+                // CADASTRO PUBLICO DE COLABORADORES.
+                // O cadastro de ADM e validado no UsuarioController.
                 .requestMatchers(HttpMethod.POST, "/api/usuario")
                 .permitAll()
 
+                // CONSULTA E ATUALIZACAO DE USUARIOS AUTENTICADOS.
+                // A regra de atualizacao do proprio perfil e validada no controller.
+                .requestMatchers(HttpMethod.PUT, "/api/usuario/**")
+                .hasAnyRole("ADM", "COLABORADOR")
+
+                // EXCLUSAO DE USUARIOS
+                .requestMatchers(HttpMethod.DELETE, "/api/usuario/**")
+                .hasRole("ADM")
+
                 // SWAGGER
                 .requestMatchers(
-                	    "/swagger-ui/**",
-                	    "/swagger-ui.html",
-                	    "/v3/api-docs/**",
-                	    "/api-docs/**",
-                	    "/api-docs")
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+                        "/api-docs/**",
+                        "/api-docs")
                 .permitAll()
 
                 // IMAGENS E QRCODES
@@ -73,164 +75,108 @@ public class SecurityConfiguration {
                         "/qrcodes/**")
                 .permitAll()
 
-                // ==========================
                 // MATERIAL
-                // ==========================
-
-                // FILTRAR — deve vir ANTES da regra geral de POST
                 .requestMatchers(HttpMethod.POST, "/api/material/filtrar")
                 .hasAnyRole("ADM", "COLABORADOR")
 
-                // LISTAR
                 .requestMatchers(HttpMethod.GET, "/api/material/**")
                 .hasAnyRole("ADM", "COLABORADOR")
 
-                // CRIAR
                 .requestMatchers(HttpMethod.POST, "/api/material/**")
                 .hasRole("ADM")
 
-                // EDITAR
                 .requestMatchers(HttpMethod.PUT, "/api/material/**")
                 .hasRole("ADM")
 
-	             // ==========================
-	             // PATRIMÔNIO
-	             // ==========================
-	
-	             .requestMatchers(
-	                     HttpMethod.GET,
-	                     "/api/patrimonio",
-	                     "/api/patrimonio/**")
-	             .hasAnyRole("ADM", "COLABORADOR")
-	
-	             .requestMatchers(
-	                     HttpMethod.POST,
-	                     "/api/patrimonio/*/qrcode/regenerar")
-	             .hasRole("ADM")
-	
-	             .requestMatchers(
-	                     HttpMethod.POST,
-	                     "/api/patrimonio/**")
-	             .hasRole("ADM")
-	
-	             .requestMatchers(
-	                     HttpMethod.PUT,
-	                     "/api/patrimonio/**")
-	             .hasRole("ADM")
-	
-	             .requestMatchers(
-	                     HttpMethod.DELETE,
-	                     "/api/patrimonio/**")
-	             .hasRole("ADM")
+                // PATRIMONIO
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/patrimonio",
+                        "/api/patrimonio/**")
+                .hasAnyRole("ADM", "COLABORADOR")
 
-                // ==========================
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/patrimonio/*/qrcode/regenerar")
+                .hasRole("ADM")
+
+                .requestMatchers(HttpMethod.POST, "/api/patrimonio/**")
+                .hasRole("ADM")
+
+                .requestMatchers(HttpMethod.PUT, "/api/patrimonio/**")
+                .hasRole("ADM")
+
+                .requestMatchers(HttpMethod.DELETE, "/api/patrimonio/**")
+                .hasRole("ADM")
+
                 // CATEGORIA
-                // ==========================
-
-                // LISTAR
                 .requestMatchers(HttpMethod.GET, "/api/categoria/**")
                 .hasAnyRole("ADM", "COLABORADOR")
 
-                // CRIAR
                 .requestMatchers(HttpMethod.POST, "/api/categoria/**")
                 .hasRole("ADM")
 
-                // EDITAR
                 .requestMatchers(HttpMethod.PUT, "/api/categoria/**")
                 .hasRole("ADM")
 
-                .requestMatchers(
-                        HttpMethod.DELETE,
-                        "/api/categoria/**")
+                .requestMatchers(HttpMethod.DELETE, "/api/categoria/**")
                 .hasRole("ADM")
 
-                // ==========================
-                // MOVIMENTAÇÃO
-                // ==========================
-
+                // MOVIMENTACAO
                 .requestMatchers(
                         HttpMethod.GET,
                         "/api/movimentacao",
                         "/api/movimentacao/**")
                 .hasAnyRole("ADM", "COLABORADOR")
 
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/api/movimentacao/**")
-                .hasRole("ADM")
-
-                // ==========================
-                // SOLICITAÇÃO MOVIMENTAÇÃO
-                // ==========================
-
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/api/solicitacao-movimentacao/solicitar")
+                // A rota implementada pelo controller cria uma solicitacao.
+                .requestMatchers(HttpMethod.POST, "/api/movimentacao")
                 .hasAnyRole("ADM", "COLABORADOR")
 
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/api/solicitacao-movimentacao/**")
+                // Outras operacoes POST de movimentacao ficam restritas ao ADM.
+                .requestMatchers(HttpMethod.POST, "/api/movimentacao/**")
                 .hasRole("ADM")
 
+                // Somente ADM pode aprovar ou reprovar solicitacoes.
                 .requestMatchers(
                         HttpMethod.PUT,
-                        "/api/solicitacao-movimentacao/**")
+                        "/api/movimentacao/*/aprovar",
+                        "/api/movimentacao/*/reprovar")
                 .hasRole("ADM")
 
-                // ==========================
-                // MANUTENÇÃO
-                // ==========================
-
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/api/manutencao/solicitar")
-                .hasAnyRole("ADM", "COLABORADOR")
-
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/api/manutencao/**")
-                .hasAnyRole("ADM", "COLABORADOR")
-
-                .requestMatchers(
-                        HttpMethod.PUT,
-                        "/api/manutencao/**")
+                .requestMatchers(HttpMethod.PUT, "/api/movimentacao/**")
                 .hasRole("ADM")
-                
-                // ==========================
-                // NOTIFICAÇÃO
-                // ==========================
-                
+
+                // MANUTENCAO
+                .requestMatchers(HttpMethod.POST, "/api/manutencao/solicitar")
+                .hasAnyRole("ADM", "COLABORADOR")
+
+                .requestMatchers(HttpMethod.GET, "/api/manutencao/**")
+                .hasAnyRole("ADM", "COLABORADOR")
+
+                .requestMatchers(HttpMethod.PUT, "/api/manutencao/**")
+                .hasRole("ADM")
+
+                // NOTIFICACAO
                 .requestMatchers(
                         HttpMethod.GET,
                         "/api/notificacao",
                         "/api/notificacao/**")
                 .hasAnyRole("ADM", "COLABORADOR")
 
-                .requestMatchers(
-                        HttpMethod.PUT,
-                        "/api/notificacao/**")
+                .requestMatchers(HttpMethod.PUT, "/api/notificacao/**")
                 .hasAnyRole("ADM", "COLABORADOR")
 
-                .requestMatchers(
-                        HttpMethod.DELETE,
-                        "/api/notificacao/**")
+                .requestMatchers(HttpMethod.DELETE, "/api/notificacao/**")
                 .hasAnyRole("ADM", "COLABORADOR")
 
-                // RESTANTE
                 .anyRequest()
                 .authenticated()
             )
-
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-
-            // =========================
-            // PROVIDER  
-            // =========================
             .authenticationProvider(authenticationProvider)
-
             .addFilterBefore(
                 jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class
@@ -244,7 +190,6 @@ public class SecurityConfiguration {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // FRONTENDS
         configuration.setAllowedOrigins(Arrays.asList(
             "http://localhost:3000",
             "http://localhost:5173",
@@ -253,14 +198,11 @@ public class SecurityConfiguration {
             "http://localhost:19006"
         ));
 
-        // MÉTODOS
         configuration.setAllowedMethods(Arrays.asList(
             "GET", "POST", "PUT", "DELETE", "OPTIONS"
         ));
 
-        // HEADERS
         configuration.setAllowedHeaders(Arrays.asList("*"));
-
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
