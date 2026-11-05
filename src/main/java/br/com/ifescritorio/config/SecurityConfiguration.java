@@ -51,7 +51,16 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.POST, "/api/usuario")
                 .permitAll()
 
-                // CONSULTA E ATUALIZACAO DE USUARIOS AUTENTICADOS.
+                // LISTAGEM GERAL DE USUARIOS
+                .requestMatchers(HttpMethod.GET, "/api/usuario")
+                .hasRole("ADM")
+
+                // CONSULTA INDIVIDUAL DE USUARIO AUTENTICADO.
+                // O controller permite ADM ou o proprio usuario.
+                .requestMatchers(HttpMethod.GET, "/api/usuario/**")
+                .hasAnyRole("ADM", "COLABORADOR")
+
+                // ATUALIZACAO DE USUARIOS AUTENTICADOS.
                 // A regra de atualizacao do proprio perfil e validada no controller.
                 .requestMatchers(HttpMethod.PUT, "/api/usuario/**")
                 .hasAnyRole("ADM", "COLABORADOR")
