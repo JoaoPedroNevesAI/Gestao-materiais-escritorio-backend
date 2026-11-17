@@ -35,15 +35,33 @@ public class AuditoriaService {
             Object dadosAnteriores,
             Object dadosNovos) {
 
-        Usuario usuario = obterUsuarioAutenticado();
+        return registrarComUsuario(
+                acao,
+                entidade,
+                registroId,
+                descricao,
+                dadosAnteriores,
+                dadosNovos,
+                obterUsuarioAutenticado());
+    }
+
+    @Transactional
+    public RegistroAuditoria registrarComUsuario(
+            TipoAcaoAuditoria acao,
+            String entidade,
+            Long registroId,
+            String descricao,
+            Object dadosAnteriores,
+            Object dadosNovos,
+            Usuario usuario) {
 
         RegistroAuditoria registro = RegistroAuditoria.builder()
                 .usuarioId(usuario != null ? usuario.getId() : null)
-                .usuarioNome(usuario != null ? usuario.getNome() : null)
+                .usuarioNome(usuario != null ? usuario.getNome() : "ANONIMO")
                 .usuarioTipo(
                         usuario != null && usuario.getTipo() != null
                                 ? usuario.getTipo().name()
-                                : null)
+                                : "ANONIMO")
                 .acao(acao)
                 .entidade(entidade)
                 .registroId(registroId)
