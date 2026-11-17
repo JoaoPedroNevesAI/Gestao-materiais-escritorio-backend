@@ -1,7 +1,9 @@
 package br.com.ifescritorio.model.usuario;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -104,6 +106,33 @@ public class UsuarioService implements UserDetailsService {
                         "tipo", usuario.getTipo().name(),
                         "habilitado", usuario.getHabilitado());
 
+        List<String> camposAlterados = new ArrayList<>();
+
+        if (!Objects.equals(usuario.getNome(), novosDados.getNome())) {
+            camposAlterados.add("nome");
+        }
+        if (!Objects.equals(usuario.getEmail(), novosDados.getEmail())) {
+            camposAlterados.add("email");
+        }
+        if (!Objects.equals(usuario.getCpf(), novosDados.getCpf())) {
+            camposAlterados.add("cpf");
+        }
+        if (!Objects.equals(usuario.getTelefone(), novosDados.getTelefone())) {
+            camposAlterados.add("telefone");
+        }
+        if (
+                novosDados.getSenha() != null &&
+                !novosDados.getSenha().isBlank()
+        ) {
+            camposAlterados.add("senha");
+        }
+        if (
+                novosDados.getTipo() != null &&
+                novosDados.getTipo() != usuario.getTipo()
+        ) {
+            camposAlterados.add("tipo");
+        }
+
         usuario.setNome(novosDados.getNome());
         usuario.setEmail(novosDados.getEmail());
         usuario.setCpf(novosDados.getCpf());
@@ -134,7 +163,8 @@ public class UsuarioService implements UserDetailsService {
                 AuditoriaDados.mapa(
                         "nome", atualizado.getNome(),
                         "tipo", atualizado.getTipo().name(),
-                        "habilitado", atualizado.getHabilitado()));
+                        "habilitado", atualizado.getHabilitado(),
+                        "camposAlterados", camposAlterados));
 
         return atualizado;
     }
