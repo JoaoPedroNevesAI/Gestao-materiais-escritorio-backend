@@ -1,6 +1,7 @@
 package br.com.ifescritorio.ifescritorio;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -26,8 +27,6 @@ import br.com.ifescritorio.model.auditoria.RegistroAuditoriaRepository;
 import br.com.ifescritorio.model.auditoria.TipoAcaoAuditoria;
 import br.com.ifescritorio.model.usuario.TipoUsuario;
 import br.com.ifescritorio.model.usuario.Usuario;
-
-import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class AuditoriaServiceTest {
@@ -115,7 +114,7 @@ class AuditoriaServiceTest {
 
         RegistroAuditoria registro = captor.getValue();
 
-        assertEquals(null, registro.getUsuarioId());
+        assertNull(registro.getUsuarioId());
         assertEquals("ANONIMO", registro.getUsuarioNome());
         assertEquals("ANONIMO", registro.getUsuarioTipo());
         assertEquals(TipoAcaoAuditoria.CRIACAO, registro.getAcao());
