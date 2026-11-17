@@ -1,11 +1,15 @@
 package br.com.ifescritorio.model.patrimonio;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.ifescritorio.model.auditoria.AuditoriaDados;
+import br.com.ifescritorio.model.auditoria.AuditoriaService;
+import br.com.ifescritorio.model.auditoria.TipoAcaoAuditoria;
 import br.com.ifescritorio.util.QrCodeUtil;
 import br.com.ifescritorio.util.exception.EntidadeNaoEncontradaException;
 import br.com.ifescritorio.util.exception.RegraNegocioException;
@@ -15,6 +19,9 @@ public class PatrimonioService {
 
     @Autowired
     private PatrimonioRepository repository;
+
+    @Autowired
+    private AuditoriaService auditoriaService;
 
     public Patrimonio obterPorId(Long id) {
 
@@ -62,6 +69,13 @@ public class PatrimonioService {
                     }
                 });
 
+        Patrimonio existente = patrimonio.getId() != null
+                ? repository.findById(patrimonio.getId()).orElse(null)
+                : null;
+
+        Map<String, Object> dadosAnteriores =
+                existente != null ? dadosPatrimonio(existente) : null;
+
         patrimonio.setCodigoPatrimonio(codigo);
 
         /*
@@ -80,9 +94,21 @@ public class PatrimonioService {
                 codigo
         );
 
-        return repository.save(
-                patrimonio
-        );
+        Patrimonio salvo = repository.save(patrimonio);
+
+        auditoriaService.registrar(
+                existente == null
+                        ? TipoAcaoAuditoria.CRIACAO
+                        : TipoAcaoAuditoria.ATUALIZACAO,
+                "PATRIMONIO",
+                salvo.getId(),
+                existente == null
+                        ? "Cadastro de patrimônio"
+                        : "Atualização de patrimônio",
+                dadosAnteriores,
+                dadosPatrimonio(salvo));
+
+        return salvo;
     }
 
     /**
@@ -127,24 +153,57 @@ public class PatrimonioService {
                 codigo
         );
 
-        return repository.save(
-                patrimonio
-        );
+        Patrimonio salvo = repository.save(patrimonio);
+
+        auditoriaService.registrar(
+                TipoAcaoAuditoria.REGENERACAO_QRCODE,
+                "PATRIMONIO",
+                salvo.getId(),
+                "QR Code do patrimônio regenerado",
+                null,
+                AuditoriaDados.mapa(
+                        "codigoPatrimonio", salvo.getCodigoPatrimonio()));
+
+        return salvo;
     }
 
+    @Transactional
     public void deletar(
             Long id) {
 
         Patrimonio patrimonio =
                 obterPorId(id);
 
-        patrimonio.setHabilitado(
-                Boolean.FALSE
-        );
+        Map<String, Object> dadosAnteriores = dadosPatrimonio(patrimonio);
 
-        repository.save(
-                patrimonio
-        );
+        patrimonio.setHabilitado(Boolean.FALSE);
+
+        Patrimonio desabilitado = repository.save(patrimonio);
+
+        auditoriaService.registrar(
+                TipoAcaoAuditoria.DESATIVACAO,
+                "PATRIMONIO",
+                desabilitado.getId(),
+                "Desativação de patrimônio",
+                dadosAnteriores,
+                dadosPatrimonio(desabilitado));
+    }
+
+    private Map<String, Object> dadosPatrimonio(Patrimonio patrimonio) {
+
+        return AuditoriaDados.mapa(
+                "codigoPatrimonio", patrimonio.getCodigoPatrimonio(),
+                "status", patrimonio.getStatus() != null
+                        ? patrimonio.getStatus().name() : null,
+                "materialId", patrimonio.getMaterial() != null
+                        ? patrimonio.getMaterial().getId() : null,
+                "materialNome", patrimonio.getMaterial() != null
+                        ? patrimonio.getMaterial().getNome() : null,
+                "localId", patrimonio.getLocal() != null
+                        ? patrimonio.getLocal().getId() : null,
+                "localNome", patrimonio.getLocal() != null
+                        ? patrimonio.getLocal().getNome() : null,
+                "habilitado", patrimonio.getHabilitado());
     }
 
     public Patrimonio obterPorCodigo(
