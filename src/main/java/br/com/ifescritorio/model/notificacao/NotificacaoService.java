@@ -138,17 +138,21 @@ public class NotificacaoService {
             );
         }
 
+        boolean jaEstavaLida = Boolean.TRUE.equals(notificacao.getLida());
+
         notificacao.setLida(Boolean.TRUE);
 
         repository.save(notificacao);
 
-        auditoriaService.registrar(
-                TipoAcaoAuditoria.ATUALIZACAO,
-                "NOTIFICACAO",
-                notificacao.getId(),
-                "Notificação marcada como lida",
-                AuditoriaDados.mapa("lida", Boolean.FALSE),
-                AuditoriaDados.mapa("lida", Boolean.TRUE));
+        if (!jaEstavaLida) {
+            auditoriaService.registrar(
+                    TipoAcaoAuditoria.ATUALIZACAO,
+                    "NOTIFICACAO",
+                    notificacao.getId(),
+                    "Notificação marcada como lida",
+                    AuditoriaDados.mapa("lida", Boolean.FALSE),
+                    AuditoriaDados.mapa("lida", Boolean.TRUE));
+        }
     }
 
     @Transactional
