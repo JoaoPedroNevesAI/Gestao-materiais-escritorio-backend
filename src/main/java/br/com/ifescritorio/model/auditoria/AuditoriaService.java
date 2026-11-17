@@ -2,6 +2,9 @@ package br.com.ifescritorio.model.auditoria;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -72,6 +75,40 @@ public class AuditoriaService {
                 .build();
 
         return repository.save(registro);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RegistroAuditoria> listar(
+            Long usuarioId,
+            TipoAcaoAuditoria acao,
+            String entidade,
+            Long registroId,
+            LocalDateTime dataInicio,
+            LocalDateTime dataFim,
+            Pageable pageable) {
+
+        if (
+                dataInicio != null &&
+                dataFim != null &&
+                dataInicio.isAfter(dataFim)
+        ) {
+            throw new IllegalArgumentException(
+                    "A data inicial não pode ser posterior à data final.");
+        }
+
+        String entidadeFiltro =
+                entidade == null || entidade.isBlank()
+                        ? null
+                        : entidade.trim();
+
+        return repository.buscar(
+                usuarioId,
+                acao,
+                entidadeFiltro,
+                registroId,
+                dataInicio,
+                dataFim,
+                pageable);
     }
 
     private Usuario obterUsuarioAutenticado() {
