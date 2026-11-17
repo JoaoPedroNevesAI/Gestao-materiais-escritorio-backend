@@ -63,7 +63,15 @@ public class AuditoriaController {
                     direction = Sort.Direction.DESC)
             Pageable pageable) {
 
-        int tamanhoPagina = Math.min(pageable.getPageSize(), 100);
+        if (
+                dataInicio != null &&
+                dataFim != null &&
+                dataInicio.isAfter(dataFim)
+        ) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        int tamanhoPagina = Math.max(1, Math.min(pageable.getPageSize(), 100));
 
         Pageable paginaSegura = PageRequest.of(
                 pageable.getPageNumber(),
