@@ -13,5 +13,7 @@ public enum TipoAcaoAuditoria {
     LEITURA,
     UPLOAD,
     DOWNLOAD,
+    DESATIVACAO,
+    REGENERACAO_QRCODE,
     OUTRO
 }
