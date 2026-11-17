@@ -2,10 +2,15 @@ package br.com.ifescritorio.model.manutencao;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import br.com.ifescritorio.model.auditoria.AuditoriaDados;
+import br.com.ifescritorio.model.auditoria.AuditoriaService;
+import br.com.ifescritorio.model.auditoria.TipoAcaoAuditoria;
 import br.com.ifescritorio.model.notificacao.NotificacaoService;
 import br.com.ifescritorio.model.notificacao.TipoNotificacao;
 import br.com.ifescritorio.model.patrimonio.Patrimonio;
@@ -25,6 +30,10 @@ public class ManutencaoService {
     @Autowired
     private NotificacaoService notificacaoService;
 
+    @Autowired
+    private AuditoriaService auditoriaService;
+
+    @Transactional
     public Manutencao solicitar(
             Long patrimonioId,
             String descricao,
@@ -49,6 +58,15 @@ public class ManutencaoService {
         Manutencao salva =
                 repository.save(manutencao);
 
+        auditoriaService.registrar(
+                TipoAcaoAuditoria.SOLICITACAO,
+                "MANUTENCAO",
+                salva.getId(),
+                "Solicitação de manutenção criada para o patrimônio "
+                        + patrimonio.getCodigoPatrimonio(),
+                null,
+                dadosManutencao(salva));
+
         notificacaoService.notificarAdministradores(
                 "Nova manutenção pendente",
                 "Foi solicitada uma manutenção para o patrimônio "
@@ -61,6 +79,7 @@ public class ManutencaoService {
         return salva;
     }
 
+    @Transactional
     public Manutencao aprovar(
             Long id,
             String observacaoAdmin) {
@@ -72,6 +91,8 @@ public class ManutencaoService {
                                         "Manutencao",
                                         id));
 
+        Map<String, Object> dadosAnteriores = dadosManutencao(manutencao);
+
         manutencao.setStatus(
                 StatusManutencao.APROVADA);
 
@@ -80,6 +101,14 @@ public class ManutencaoService {
 
         Manutencao salva =
                 repository.save(manutencao);
+
+        auditoriaService.registrar(
+                TipoAcaoAuditoria.APROVACAO,
+                "MANUTENCAO",
+                salva.getId(),
+                "Solicitação de manutenção aprovada",
+                dadosAnteriores,
+                dadosManutencao(salva));
 
         if (salva.getSolicitante() != null) {
 
@@ -98,6 +127,7 @@ public class ManutencaoService {
         return salva;
     }
 
+    @Transactional
     public Manutencao reprovar(
             Long id,
             String observacaoAdmin) {
@@ -109,6 +139,8 @@ public class ManutencaoService {
                                         "Manutencao",
                                         id));
 
+        Map<String, Object> dadosAnteriores = dadosManutencao(manutencao);
+
         manutencao.setStatus(
                 StatusManutencao.REPROVADA);
 
@@ -117,6 +149,14 @@ public class ManutencaoService {
 
         Manutencao salva =
                 repository.save(manutencao);
+
+        auditoriaService.registrar(
+                TipoAcaoAuditoria.REPROVACAO,
+                "MANUTENCAO",
+                salva.getId(),
+                "Solicitação de manutenção reprovada",
+                dadosAnteriores,
+                dadosManutencao(salva));
 
         if (salva.getSolicitante() != null) {
 
@@ -135,6 +175,7 @@ public class ManutencaoService {
         return salva;
     }
 
+    @Transactional
     public Manutencao concluir(
             Long id,
             String observacaoAdmin) {
@@ -146,6 +187,8 @@ public class ManutencaoService {
                                         "Manutencao",
                                         id));
 
+        Map<String, Object> dadosAnteriores = dadosManutencao(manutencao);
+
         manutencao.setStatus(
                 StatusManutencao.CONCLUIDA);
 
@@ -154,6 +197,14 @@ public class ManutencaoService {
 
         Manutencao salva =
                 repository.save(manutencao);
+
+        auditoriaService.registrar(
+                TipoAcaoAuditoria.CONCLUSAO,
+                "MANUTENCAO",
+                salva.getId(),
+                "Manutenção concluída",
+                dadosAnteriores,
+                dadosManutencao(salva));
 
         if (salva.getSolicitante() != null) {
 
@@ -170,6 +221,19 @@ public class ManutencaoService {
         }
 
         return salva;
+    }
+
+    private Map<String, Object> dadosManutencao(Manutencao manutencao) {
+
+        return AuditoriaDados.mapa(
+                "patrimonioId", manutencao.getPatrimonio() != null
+                        ? manutencao.getPatrimonio().getId() : null,
+                "codigoPatrimonio", manutencao.getPatrimonio() != null
+                        ? manutencao.getPatrimonio().getCodigoPatrimonio() : null,
+                "status", manutencao.getStatus() != null
+                        ? manutencao.getStatus().name() : null,
+                "solicitanteId", manutencao.getSolicitante() != null
+                        ? manutencao.getSolicitante().getId() : null);
     }
 
     /**
