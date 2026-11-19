@@ -34,6 +34,10 @@ services:
       SECURITY_JWT_SECRETKEY: "${JWT_SECRET_KEY:?Configure JWT_SECRET_KEY no arquivo .env}"
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       UPLOAD_DIR: /app/uploads/
+      BOOTSTRAP_ADMIN_ENABLED: "${BOOTSTRAP_ADMIN_ENABLED:-false}"
+      BOOTSTRAP_ADMIN_NOME: "${BOOTSTRAP_ADMIN_NOME:-}"
+      BOOTSTRAP_ADMIN_EMAIL: "${BOOTSTRAP_ADMIN_EMAIL:-}"
+      BOOTSTRAP_ADMIN_SENHA: "${BOOTSTRAP_ADMIN_SENHA:-}"
     volumes:
       - uploads:/app/uploads
 
