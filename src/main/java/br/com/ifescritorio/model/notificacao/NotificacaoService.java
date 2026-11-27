@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.ifescritorio.model.auditoria.AuditoriaDados;
+import br.com.ifescritorio.model.auditoria.AuditoriaService;
+import br.com.ifescritorio.model.auditoria.TipoAcaoAuditoria;
 import br.com.ifescritorio.model.usuario.TipoUsuario;
 import br.com.ifescritorio.model.usuario.Usuario;
 import br.com.ifescritorio.model.usuario.UsuarioRepository;
@@ -20,6 +23,9 @@ public class NotificacaoService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private AuditoriaService auditoriaService;
 
     @Transactional
     public Notificacao criar(
@@ -40,7 +46,21 @@ public class NotificacaoService {
                         .referenciaId(referenciaId)
                         .build();
 
-        return repository.save(notificacao);
+        Notificacao salva = repository.save(notificacao);
+
+        auditoriaService.registrar(
+                TipoAcaoAuditoria.CRIACAO,
+                "NOTIFICACAO",
+                salva.getId(),
+                "Notificação criada",
+                null,
+                AuditoriaDados.mapa(
+                        "usuarioDestinoId", usuario.getId(),
+                        "tipo", tipo.name(),
+                        "titulo", titulo,
+                        "referenciaId", referenciaId));
+
+        return salva;
     }
 
     /**
@@ -118,9 +138,21 @@ public class NotificacaoService {
             );
         }
 
+        boolean jaEstavaLida = Boolean.TRUE.equals(notificacao.getLida());
+
         notificacao.setLida(Boolean.TRUE);
 
         repository.save(notificacao);
+
+        if (!jaEstavaLida) {
+            auditoriaService.registrar(
+                    TipoAcaoAuditoria.ATUALIZACAO,
+                    "NOTIFICACAO",
+                    notificacao.getId(),
+                    "Notificação marcada como lida",
+                    AuditoriaDados.mapa("lida", Boolean.FALSE),
+                    AuditoriaDados.mapa("lida", Boolean.TRUE));
+        }
     }
 
     @Transactional
@@ -138,6 +170,16 @@ public class NotificacaoService {
         }
 
         repository.saveAll(notificacoes);
+
+        if (!notificacoes.isEmpty()) {
+            auditoriaService.registrar(
+                    TipoAcaoAuditoria.ATUALIZACAO,
+                    "NOTIFICACAO",
+                    null,
+                    "Todas as notificações pendentes foram marcadas como lidas",
+                    AuditoriaDados.mapa("quantidade", notificacoes.size()),
+                    AuditoriaDados.mapa("lidas", Boolean.TRUE));
+        }
     }
 
     @Transactional
@@ -162,5 +204,16 @@ public class NotificacaoService {
         }
 
         repository.delete(notificacao);
+
+        auditoriaService.registrar(
+                TipoAcaoAuditoria.EXCLUSAO,
+                "NOTIFICACAO",
+                notificacao.getId(),
+                "Notificação excluída",
+                AuditoriaDados.mapa(
+                        "usuarioDestinoId", notificacao.getUsuario().getId(),
+                        "tipo", notificacao.getTipo().name(),
+                        "titulo", notificacao.getTitulo()),
+                null);
     }
 }

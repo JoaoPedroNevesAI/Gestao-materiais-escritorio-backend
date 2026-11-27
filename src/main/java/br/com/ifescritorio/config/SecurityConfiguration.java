@@ -179,6 +179,13 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.DELETE, "/api/notificacao/**")
                 .hasAnyRole("ADM", "COLABORADOR")
 
+                // AUDITORIA: consulta restrita a administradores
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/auditoria",
+                        "/api/auditoria/**")
+                .hasRole("ADM")
+
                 .anyRequest()
                 .authenticated()
             )

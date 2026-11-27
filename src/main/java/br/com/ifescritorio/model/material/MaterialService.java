@@ -1,11 +1,15 @@
 package br.com.ifescritorio.model.material;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.com.ifescritorio.model.auditoria.AuditoriaDados;
+import br.com.ifescritorio.model.auditoria.AuditoriaService;
+import br.com.ifescritorio.model.auditoria.TipoAcaoAuditoria;
 import br.com.ifescritorio.model.categoria.Categoria;
 import br.com.ifescritorio.model.categoria.CategoriaRepository;
 import br.com.ifescritorio.model.local.Local;
@@ -32,6 +36,9 @@ public class MaterialService {
 
     @Autowired
     private PatrimonioRepository patrimonioRepository;
+
+    @Autowired
+    private AuditoriaService auditoriaService;
 
     @Transactional
     public Material save(Material material) {
@@ -61,6 +68,14 @@ public class MaterialService {
 
         gerarPatrimonios(materialSalvo);
 
+        auditoriaService.registrar(
+                TipoAcaoAuditoria.CRIACAO,
+                "MATERIAL",
+                materialSalvo.getId(),
+                "Cadastro de material e geração automática dos patrimônios",
+                null,
+                dadosMaterial(materialSalvo));
+
         return materialSalvo;
     }
 
@@ -75,6 +90,8 @@ public class MaterialService {
                                 new EntidadeNaoEncontradaException(
                                         "Material",
                                         id));
+
+        Map<String, Object> dadosAnteriores = dadosMaterial(material);
 
         material.setNome(
                 novosDados.getNome());
@@ -117,7 +134,17 @@ public class MaterialService {
             material.setLocal(local);
         }
 
-        return repository.save(material);
+        Material atualizado = repository.save(material);
+
+        auditoriaService.registrar(
+                TipoAcaoAuditoria.ATUALIZACAO,
+                "MATERIAL",
+                atualizado.getId(),
+                "Atualização de material",
+                dadosAnteriores,
+                dadosMaterial(atualizado));
+
+        return atualizado;
     }
 
     @Transactional
@@ -132,14 +159,28 @@ public class MaterialService {
                                         "Material",
                                         id));
 
+        String imagemAnterior = material.getImagem();
+
         String nomeImagem =
                 Util.fazerUploadImagem(imagem);
 
         if (nomeImagem != null) {
             material.setImagem(nomeImagem);
+
+            Material atualizado = repository.save(material);
+
+            auditoriaService.registrar(
+                    TipoAcaoAuditoria.UPLOAD,
+                    "MATERIAL",
+                    atualizado.getId(),
+                    "Imagem de material enviada ou atualizada",
+                    AuditoriaDados.mapa("imagem", imagemAnterior),
+                    AuditoriaDados.mapa("imagem", nomeImagem));
+
+            return atualizado;
         }
 
-        return repository.save(material);
+        return material;
     }
 
     public List<Material> listarTodos() {
@@ -166,9 +207,19 @@ public class MaterialService {
                                         "Material",
                                         id));
 
+        Map<String, Object> dadosAnteriores = dadosMaterial(material);
+
         material.setHabilitado(Boolean.FALSE);
 
-        repository.save(material);
+        Material desabilitado = repository.save(material);
+
+        auditoriaService.registrar(
+                TipoAcaoAuditoria.DESATIVACAO,
+                "MATERIAL",
+                desabilitado.getId(),
+                "Desativação de material",
+                dadosAnteriores,
+                dadosMaterial(desabilitado));
     }
 
     public List<Material> filtrar(
@@ -223,6 +274,24 @@ public class MaterialService {
         return listaMateriais;
     }
 
+    private Map<String, Object> dadosMaterial(Material material) {
+
+        return AuditoriaDados.mapa(
+                "nome", material.getNome(),
+                "descricao", material.getDescricao(),
+                "quantidade", material.getQuantidade(),
+                "valor", material.getValor(),
+                "categoriaId", material.getCategoria() != null
+                        ? material.getCategoria().getId() : null,
+                "categoriaNome", material.getCategoria() != null
+                        ? material.getCategoria().getNome() : null,
+                "localId", material.getLocal() != null
+                        ? material.getLocal().getId() : null,
+                "localNome", material.getLocal() != null
+                        ? material.getLocal().getNome() : null,
+                "habilitado", material.getHabilitado());
+    }
+
     /**
      * Gera automaticamente um patrimônio
      * para cada unidade do material.
@@ -243,7 +312,21 @@ public class MaterialService {
                             .observacao("Gerado automaticamente")
                             .build();
 
-            patrimonioRepository.save(patrimonio);
+            Patrimonio patrimonioSalvo = patrimonioRepository.save(patrimonio);
+
+            auditoriaService.registrar(
+                    TipoAcaoAuditoria.CRIACAO,
+                    "PATRIMONIO",
+                    patrimonioSalvo.getId(),
+                    "Patrimônio gerado automaticamente a partir do cadastro do material",
+                    null,
+                    AuditoriaDados.mapa(
+                            "codigoPatrimonio", patrimonioSalvo.getCodigoPatrimonio(),
+                            "materialId", material.getId(),
+                            "materialNome", material.getNome(),
+                            "localId", material.getLocal() != null
+                                    ? material.getLocal().getId() : null,
+                            "status", patrimonioSalvo.getStatus().name()));
 
             QrCodeUtil.gerarQRCode(codigo, codigo);
         }

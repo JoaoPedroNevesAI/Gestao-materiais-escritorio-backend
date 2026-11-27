@@ -2,11 +2,15 @@ package br.com.ifescritorio.model.movimentacao;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.ifescritorio.model.auditoria.AuditoriaDados;
+import br.com.ifescritorio.model.auditoria.AuditoriaService;
+import br.com.ifescritorio.model.auditoria.TipoAcaoAuditoria;
 import br.com.ifescritorio.model.local.Local;
 import br.com.ifescritorio.model.local.LocalRepository;
 import br.com.ifescritorio.model.notificacao.NotificacaoService;
@@ -31,6 +35,9 @@ public class MovimentacaoService {
 
     @Autowired
     private NotificacaoService notificacaoService;
+
+    @Autowired
+    private AuditoriaService auditoriaService;
 
     /**
      * Cria uma solicitação de movimentação.
@@ -84,6 +91,15 @@ public class MovimentacaoService {
         Movimentacao salva =
                 repository.save(movimentacao);
 
+        auditoriaService.registrar(
+                TipoAcaoAuditoria.SOLICITACAO,
+                "MOVIMENTACAO",
+                salva.getId(),
+                "Solicitação de movimentação criada para o patrimônio "
+                        + patrimonio.getCodigoPatrimonio(),
+                null,
+                dadosMovimentacao(salva));
+
         /*
          * Notifica todos os administradores sobre
          * a nova solicitação pendente.
@@ -128,6 +144,16 @@ public class MovimentacaoService {
                     "A movimentação não possui patrimônio associado.");
         }
 
+        Map<String, Object> dadosAnteriores =
+                dadosMovimentacao(movimentacao);
+
+        Map<String, Object> localAnterior =
+                AuditoriaDados.mapa(
+                        "localId", patrimonio.getLocal() != null
+                                ? patrimonio.getLocal().getId() : null,
+                        "localNome", patrimonio.getLocal() != null
+                                ? patrimonio.getLocal().getNome() : null);
+
         Local destino =
                 movimentacao.getLocalDestino();
 
@@ -161,6 +187,24 @@ public class MovimentacaoService {
 
         Movimentacao salva =
                 repository.save(movimentacao);
+
+        auditoriaService.registrar(
+                TipoAcaoAuditoria.APROVACAO,
+                "MOVIMENTACAO",
+                salva.getId(),
+                "Solicitação de movimentação aprovada",
+                dadosAnteriores,
+                dadosMovimentacao(salva));
+
+        auditoriaService.registrar(
+                TipoAcaoAuditoria.ATUALIZACAO,
+                "PATRIMONIO",
+                patrimonio.getId(),
+                "Local do patrimônio alterado após aprovação da movimentação",
+                localAnterior,
+                AuditoriaDados.mapa(
+                        "localId", patrimonio.getLocal().getId(),
+                        "localNome", patrimonio.getLocal().getNome()));
 
         /*
          * Notifica o usuário que fez a solicitação.
@@ -202,6 +246,9 @@ public class MovimentacaoService {
                     "Administrador não identificado.");
         }
 
+        Map<String, Object> dadosAnteriores =
+                dadosMovimentacao(movimentacao);
+
         movimentacao.setStatus(
                 StatusMovimentacao.REPROVADA);
 
@@ -216,6 +263,14 @@ public class MovimentacaoService {
 
         Movimentacao salva =
                 repository.save(movimentacao);
+
+        auditoriaService.registrar(
+                TipoAcaoAuditoria.REPROVACAO,
+                "MOVIMENTACAO",
+                salva.getId(),
+                "Solicitação de movimentação reprovada",
+                dadosAnteriores,
+                dadosMovimentacao(salva));
 
         /*
          * Notifica o usuário que fez a solicitação.
@@ -283,6 +338,30 @@ public class MovimentacaoService {
         return repository
                 .findByPatrimonioIdOrderByDataMovimentacaoDesc(
                         patrimonioId);
+    }
+
+    private Map<String, Object> dadosMovimentacao(
+            Movimentacao movimentacao) {
+
+        return AuditoriaDados.mapa(
+                "patrimonioId", movimentacao.getPatrimonio() != null
+                        ? movimentacao.getPatrimonio().getId() : null,
+                "codigoPatrimonio", movimentacao.getPatrimonio() != null
+                        ? movimentacao.getPatrimonio().getCodigoPatrimonio() : null,
+                "localOrigemId", movimentacao.getLocalOrigem() != null
+                        ? movimentacao.getLocalOrigem().getId() : null,
+                "localOrigemNome", movimentacao.getLocalOrigem() != null
+                        ? movimentacao.getLocalOrigem().getNome() : null,
+                "localDestinoId", movimentacao.getLocalDestino() != null
+                        ? movimentacao.getLocalDestino().getId() : null,
+                "localDestinoNome", movimentacao.getLocalDestino() != null
+                        ? movimentacao.getLocalDestino().getNome() : null,
+                "status", movimentacao.getStatus() != null
+                        ? movimentacao.getStatus().name() : null,
+                "solicitanteId", movimentacao.getSolicitante() != null
+                        ? movimentacao.getSolicitante().getId() : null,
+                "aprovadorId", movimentacao.getAprovador() != null
+                        ? movimentacao.getAprovador().getId() : null);
     }
 
     private void validarSolicitacaoPendente(
